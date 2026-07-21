@@ -1,0 +1,26 @@
+name: Feature or adapter request
+description: Suggest a public-safe source adapter, analysis method, or report improvement.
+title: "[Idea]: "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What research problem would this solve?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed approach
+      description: Include the platform/tool, evidence fields, and expected limitations.
+    validations:
+      required: true
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Public-safety check
+      options:
+        - label: This request does not require bypassing authentication, CAPTCHA, rate limits, or platform safeguards.
+          required: true

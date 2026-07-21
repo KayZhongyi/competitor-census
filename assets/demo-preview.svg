@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="820" viewBox="0 0 1440 820" role="img" aria-label="Fictional competitor report preview">
+  <defs><filter id="s"><feDropShadow dx="0" dy="10" stdDeviation="18" flood-color="#09233b" flood-opacity=".10"/></filter></defs>
+  <rect width="1440" height="820" rx="28" fill="#f4f7f9"/>
+  <rect width="1440" height="220" rx="28" fill="#0b2239"/><rect y="216" width="1440" height="4" fill="#d49a43"/>
+  <text x="70" y="66" fill="#e2a650" font-family="Arial,sans-serif" font-size="14" font-weight="700" letter-spacing="4">FICTIONAL OFFLINE DEMO</text>
+  <text x="70" y="133" fill="#fff" font-family="Arial,sans-serif" font-size="50" font-weight="700">Evidence before conclusions.</text>
+  <text x="70" y="177" fill="#afc2cf" font-family="Arial,sans-serif" font-size="19">A validated evidence bundle becomes quantitative findings and source-linked strategy notes.</text>
+  <g transform="translate(70 184)" filter="url(#s)" font-family="Arial,sans-serif">
+    <g><rect y="0" width="238" height="116" rx="14" fill="#fff" stroke="#dae3e8"/><text x="24" y="48" fill="#0b2239" font-size="34" font-weight="700">5</text><text x="24" y="78" fill="#6a7c89" font-size="13">CHANNELS AUDITED</text></g>
+    <g transform="translate(254)"><rect width="238" height="116" rx="14" fill="#fff" stroke="#dae3e8"/><text x="24" y="48" fill="#0b2239" font-size="34" font-weight="700">18</text><text x="24" y="78" fill="#6a7c89" font-size="13">CONTENT RECORDS</text></g>
+    <g transform="translate(508)"><rect width="238" height="116" rx="14" fill="#fff" stroke="#dae3e8"/><text x="24" y="48" fill="#0b2239" font-size="34" font-weight="700">16</text><text x="24" y="78" fill="#6a7c89" font-size="13">COMMENTS + REPLIES</text></g>
+    <g transform="translate(762)"><rect width="238" height="116" rx="14" fill="#fff" stroke="#dae3e8"/><text x="24" y="48" fill="#0b2239" font-size="34" font-weight="700">45,200</text><text x="24" y="78" fill="#6a7c89" font-size="13">VISIBLE VIEWS</text></g>
+    <g transform="translate(1016)"><rect width="238" height="116" rx="14" fill="#fff" stroke="#dae3e8"/><text x="24" y="48" fill="#0b2239" font-size="34" font-weight="700">3</text><text x="24" y="78" fill="#6a7c89" font-size="13">ACTIVE PLATFORMS</text></g>
+  </g>
+  <g transform="translate(70 340)" font-family="Arial,sans-serif">
+    <rect width="812" height="404" rx="18" fill="#fff" stroke="#dae3e8"/>
+    <text x="28" y="48" fill="#0b2239" font-size="24" font-weight="700">Content supply vs. performance</text>
+    <text x="28" y="76" fill="#71818d" font-size="14">Mean and median reach stay visible beside publication share.</text>
+    <g transform="translate(28 112)" font-size="14">
+      <text y="12" fill="#0b2239" font-weight="700">Education</text><rect x="170" y="0" width="520" height="16" rx="8" fill="#e8eef2"/><rect x="170" y="0" width="520" height="16" rx="8" fill="#d49a43"/><text x="708" y="13" fill="#637485">4,450</text>
+      <text y="64" fill="#0b2239" font-weight="700">Price</text><rect x="170" y="52" width="520" height="16" rx="8" fill="#e8eef2"/><rect x="170" y="52" width="450" height="16" rx="8" fill="#d49a43"/><text x="708" y="65" fill="#637485">3,850</text>
+      <text y="116" fill="#0b2239" font-weight="700">Installation</text><rect x="170" y="104" width="520" height="16" rx="8" fill="#e8eef2"/><rect x="170" y="104" width="344" height="16" rx="8" fill="#d49a43"/><text x="708" y="117" fill="#637485">2,950</text>
+      <text y="168" fill="#0b2239" font-weight="700">Case study</text><rect x="170" y="156" width="520" height="16" rx="8" fill="#e8eef2"/><rect x="170" y="156" width="298" height="16" rx="8" fill="#d49a43"/><text x="708" y="169" fill="#637485">2,550</text>
+      <text y="220" fill="#0b2239" font-weight="700">Service</text><rect x="170" y="208" width="520" height="16" rx="8" fill="#e8eef2"/><rect x="170" y="208" width="210" height="16" rx="8" fill="#d49a43"/><text x="708" y="221" fill="#637485">1,800</text>
+      <text y="272" fill="#0b2239" font-weight="700">Product promo</text><rect x="170" y="260" width="520" height="16" rx="8" fill="#e8eef2"/><rect x="170" y="260" width="115" height="16" rx="8" fill="#d49a43"/><text x="708" y="273" fill="#637485">986</text>
+    </g>
+  </g>
+  <g transform="translate(906 340)" font-family="Arial,sans-serif">
+    <rect width="464" height="190" rx="18" fill="#fff" stroke="#dae3e8"/>
+    <text x="26" y="46" fill="#0b2239" font-size="22" font-weight="700">Voice of customer</text>
+    <text x="26" y="82" fill="#d49a43" font-size="34" font-weight="700">Price · 4/12</text>
+    <text x="26" y="112" fill="#637485" font-size="14">Most frequent non-official comment topic</text>
+    <rect x="26" y="138" width="112" height="30" rx="15" fill="#edf3f6"/><text x="46" y="158" fill="#0b2239" font-size="12">Sizing 2/12</text>
+    <rect x="148" y="138" width="142" height="30" rx="15" fill="#edf3f6"/><text x="166" y="158" fill="#0b2239" font-size="12">Installation 2/12</text>
+  </g>
+  <g transform="translate(906 550)" font-family="Arial,sans-serif">
+    <rect width="464" height="194" rx="18" fill="#fff9ef" stroke="#e6c487"/>
+    <text x="26" y="46" fill="#6d4a17" font-size="22" font-weight="700">Traceability built in</text>
+    <text x="26" y="83" fill="#765d38" font-size="14">Every claim retains:</text>
+    <text x="26" y="112" fill="#0b2239" font-size="14">✓ row ID + publication date</text>
+    <text x="26" y="139" fill="#0b2239" font-size="14">✓ translation + visible metrics</text>
+    <text x="26" y="166" fill="#0b2239" font-size="14">✓ source URL + stated limitations</text>
+  </g>
+</svg>

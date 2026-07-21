@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Competitor Census logo">
+  <defs><linearGradient id="g" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#081d31"/><stop offset="1" stop-color="#1d5277"/></linearGradient></defs>
+  <rect width="512" height="512" rx="112" fill="url(#g)"/>
+  <circle cx="224" cy="218" r="126" fill="none" stroke="#f7fafc" stroke-width="35"/>
+  <path d="M312 308 412 408" stroke="#d49a43" stroke-width="48" stroke-linecap="round"/>
+  <path d="M144 245h42v-70h42v70h42V132h42" fill="none" stroke="#d49a43" stroke-width="28" stroke-linejoin="round"/>
+</svg>

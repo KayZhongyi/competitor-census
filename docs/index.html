@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Competitor Census — Fictional Demo</title>
+  <style>
+    :root { --ink:#0b2239; --blue:#163c5c; --gold:#d49a43; --paper:#f4f7f9; --muted:#637485; --line:#d9e2e8; }
+    * { box-sizing:border-box; }
+    body { margin:0; color:var(--ink); background:var(--paper); font:15px/1.6 Inter, ui-sans-serif, system-ui, sans-serif; }
+    a { color:#0e668c; text-decoration:none; }
+    .hero { background:linear-gradient(120deg,#081d31,#173e5d); color:white; padding:72px 7vw 64px; border-bottom:4px solid var(--gold); }
+    .eyebrow { color:#e9b45f; text-transform:uppercase; letter-spacing:.18em; font-size:12px; font-weight:800; }
+    h1 { max-width:900px; margin:14px 0 12px; font-size:clamp(38px,6vw,72px); line-height:1.02; letter-spacing:-.04em; }
+    .hero p { max-width:850px; color:#d7e1e8; font-size:18px; }
+    .scope { display:flex; flex-wrap:wrap; gap:9px; margin-top:24px; }
+    .scope span { border:1px solid #537088; border-radius:999px; padding:6px 12px; color:#e8eff4; font-size:13px; }
+    main { max-width:1180px; margin:auto; padding:42px 24px 80px; }
+    .metrics { display:grid; grid-template-columns:repeat(5,1fr); gap:12px; margin-top:-72px; position:relative; }
+    .metric { background:white; border:1px solid var(--line); border-radius:16px; padding:20px; box-shadow:0 12px 30px #09233b14; }
+    .metric b { display:block; font-size:30px; letter-spacing:-.04em; }
+    .metric span { color:var(--muted); font-size:12px; text-transform:uppercase; letter-spacing:.08em; }
+    section { background:white; border:1px solid var(--line); border-radius:18px; padding:28px; margin-top:20px; }
+    h2 { margin:0 0 6px; font-size:24px; letter-spacing:-.02em; }
+    .sub { color:var(--muted); margin:0 0 22px; }
+    .finding { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:18px; }
+    .finding article { background:#f7f9fb; border-left:4px solid var(--gold); border-radius:9px; padding:16px; }
+    .finding b { display:block; font-size:21px; }
+    table { width:100%; border-collapse:collapse; font-size:13px; }
+    th { color:var(--muted); text-transform:uppercase; letter-spacing:.06em; font-size:11px; text-align:left; }
+    th, td { border-bottom:1px solid var(--line); padding:11px 9px; vertical-align:top; }
+    .bar { width:130px; height:8px; background:#e8eef2; border-radius:9px; overflow:hidden; }
+    .bar i { display:block; height:100%; background:linear-gradient(90deg,var(--gold),#f1c272); }
+    .chips { display:flex; flex-wrap:wrap; gap:9px; }
+    .chip { background:#edf3f6; border-radius:999px; padding:7px 12px; }
+    .note { border:1px solid #ecd09e; background:#fff9ef; padding:14px 16px; border-radius:10px; margin-top:18px; color:#6c4a18; }
+    footer { color:var(--muted); text-align:center; padding:28px; }
+    @media (max-width:820px) { .metrics { grid-template-columns:repeat(2,1fr); margin-top:-40px; } .finding { grid-template-columns:1fr; } section { overflow-x:auto; } }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="eyebrow">Competitor Census · public-safe offline demo</div>
+    <h1>Evidence before conclusions.</h1>
+    <p>A fictional example showing how public channel records become a validated evidence bundle, quantitative findings, and source-linked strategy notes.</p>
+    <div class="scope"><span>Fictional company</span><span>5 channels audited</span><span>3 channels deep-dived</span><span>No API key</span><span>No live scraping</span></div>
+  </header>
+  <main>
+    <div class="metrics">
+      <div class="metric"><b>5</b><span>channels audited</span></div>
+      <div class="metric"><b>18</b><span>content records</span></div>
+      <div class="metric"><b>16</b><span>comments + replies</span></div>
+      <div class="metric"><b>45,200</b><span>visible views</span></div>
+      <div class="metric"><b>3</b><span>active platforms</span></div>
+    </div>
+
+    <section>
+      <h2>What the evidence says</h2>
+      <p class="sub">Observations are separated from interpretation. Counts and denominators remain visible.</p>
+      <div class="finding">
+        <article><b>Education</b>Highest mean reach at 4,450 views across 4 records.</article>
+        <article><b>Product Promo</b>Largest publishing share at 39%, creating a visible supply–performance gap.</article>
+        <article><b>Price</b>Most frequent user topic: 4/12 non-official comments.</article>
+      </div>
+      <div class="note"><b>Interpretation:</b> the fictional competitor publishes most often about products, while educational and price content earns stronger reach. Treat this as a testable content hypothesis—not proof of sales impact.</div>
+    </section>
+
+    <section>
+      <h2>Content supply vs. performance</h2>
+      <p class="sub">Mean and median are shown together to reduce distortion from outliers.</p>
+      <table><thead><tr><th>Category</th><th>n</th><th>Share</th><th>Mean views</th><th>Median</th><th>Relative reach</th></tr></thead><tbody>
+        <tr>
+          <td><strong>Education</strong></td>
+          <td>4</td>
+          <td>22%</td>
+          <td>4,450</td>
+          <td>4,400</td>
+          <td><div class="bar"><i style="width:100.0%"></i></div></td>
+        </tr>
+
+        <tr>
+          <td><strong>Price</strong></td>
+          <td>2</td>
+          <td>11%</td>
+          <td>3,850</td>
+          <td>3,850</td>
+          <td><div class="bar"><i style="width:86.5%"></i></div></td>
+        </tr>
+
+        <tr>
+          <td><strong>Installation</strong></td>
+          <td>2</td>
+          <td>11%</td>
+          <td>2,950</td>
+          <td>2,950</td>
+          <td><div class="bar"><i style="width:66.3%"></i></div></td>
+        </tr>
+
+        <tr>
+          <td><strong>Case Study</strong></td>
+          <td>2</td>
+          <td>11%</td>
+          <td>2,550</td>
+          <td>2,550</td>
+          <td><div class="bar"><i style="width:57.3%"></i></div></td>
+        </tr>
+
+        <tr>
+          <td><strong>Service</strong></td>
+          <td>1</td>
+          <td>6%</td>
+          <td>1,800</td>
+          <td>1,800</td>
+          <td><div class="bar"><i style="width:40.4%"></i></div></td>
+        </tr>
+
+        <tr>
+          <td><strong>Product Promo</strong></td>
+          <td>7</td>
+          <td>39%</td>
+          <td>986</td>
+          <td>980</td>
+          <td><div class="bar"><i style="width:22.2%"></i></div></td>
+        </tr></tbody></table>
+    </section>
+
+    <section>
+      <h2>Voice of customer</h2>
+      <p class="sub">Official replies are excluded from demand counts.</p>
+      <div class="chips"><span class='chip'><b>Price</b> 4/12</span><span class='chip'><b>Sizing</b> 2/12</span><span class='chip'><b>Installation</b> 2/12</span><span class='chip'><b>Compatibility</b> 2/12</span><span class='chip'><b>Warranty</b> 1/12</span><span class='chip'><b>Delivery</b> 1/12</span></div>
+      <p class="note"><b>Visible official response modes:</b> redirect 2/4, useful answer 1/4, template 1/4. A redirect to DM/support is counted separately from a useful public answer.</p>
+    </section>
+
+    <section>
+      <h2>Evidence ledger</h2>
+      <p class="sub">The report keeps row IDs, dates, metrics, translations, and links together.</p>
+      <table><thead><tr><th>ID</th><th>Platform</th><th>Date</th><th>Translated text</th><th>Views</th><th>Evidence</th></tr></thead><tbody>
+        <tr>
+          <td><code>NS-010</code></td>
+          <td>TikTok</td>
+          <td>2026-04-18</td>
+          <td>What happens during a grid outage</td>
+          <td>5,200</td>
+          <td><a href="https://example.com/content/NS-010">source ↗</a></td>
+        </tr>
+
+        <tr>
+          <td><code>NS-011</code></td>
+          <td>Instagram</td>
+          <td>2026-05-03</td>
+          <td>5 kWh or 10 kWh battery?</td>
+          <td>4,600</td>
+          <td><a href="https://example.com/content/NS-011">source ↗</a></td>
+        </tr>
+
+        <tr>
+          <td><code>NS-008</code></td>
+          <td>TikTok</td>
+          <td>2026-01-27</td>
+          <td>How to choose the right battery size</td>
+          <td>4,200</td>
+          <td><a href="https://example.com/content/NS-008">source ↗</a></td>
+        </tr>
+
+        <tr>
+          <td><code>NS-013</code></td>
+          <td>Instagram</td>
+          <td>2026-05-22</td>
+          <td>Budget examples by system size</td>
+          <td>4,100</td>
+          <td><a href="https://example.com/content/NS-013">source ↗</a></td>
+        </tr>
+
+        <tr>
+          <td><code>NS-009</code></td>
+          <td>YouTube</td>
+          <td>2026-02-25</td>
+          <td>Three mistakes when sizing a home system</td>
+          <td>3,800</td>
+          <td><a href="https://example.com/content/NS-009">source ↗</a></td>
+        </tr>
+
+        <tr>
+          <td><code>NS-012</code></td>
+          <td>TikTok</td>
+          <td>2026-03-08</td>
+          <td>How much does a home system cost?</td>
+          <td>3,600</td>
+          <td><a href="https://example.com/content/NS-012">source ↗</a></td>
+        </tr></tbody></table>
+    </section>
+
+    <section>
+      <h2>Scope and limitations</h2>
+      <p>This is a deliberately small, fictional dataset used to demonstrate the workflow. Real runs must state platform scope, cutoff time, visible-versus-captured totals, comment selection rules, unavailable records, authentication state, and known personalization effects. Public visibility does not authorize bypassing platform controls or unrestricted republication.</p>
+    </section>
+  </main>
+  <footer>Generated by Competitor Census · 2026-07-21T07:33:39+00:00</footer>
+</body>
+</html>

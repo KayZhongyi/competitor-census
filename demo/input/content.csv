@@ -1,0 +1,19 @@
+record_id,platform,account,published_at,language,text_original,text_translation,views,likes,comments_count,shares,url,content_type,brand
+NS-001,TikTok,@northstar_demo,2026-01-05,id,"Sistem baterai baru tersedia","New battery system now available",920,41,2,3,https://example.com/content/NS-001,product_promo,Northstar
+NS-002,Instagram,@northstar_demo,2026-01-18,en,"Meet our newest inverter","Meet our newest inverter",1100,52,3,5,https://example.com/content/NS-002,product_promo,Northstar
+NS-003,TikTok,@northstar_demo,2026-02-02,es,"Potencia para cada hogar","Power for every home",800,35,1,2,https://example.com/content/NS-003,product_promo,Northstar
+NS-004,YouTube,@northstar_demo,2026-02-16,en,"Northstar product showcase","Northstar product showcase",1300,61,4,8,https://example.com/content/NS-004,product_promo,Northstar
+NS-005,Instagram,@northstar_demo,2026-03-01,id,"Energi andal setiap hari","Reliable energy every day",750,30,2,2,https://example.com/content/NS-005,product_promo,Northstar
+NS-006,TikTok,@northstar_demo,2026-03-19,en,"Compact design. Serious power.","Compact design. Serious power.",980,43,3,4,https://example.com/content/NS-006,product_promo,Northstar
+NS-007,Instagram,@northstar_demo,2026-04-04,es,"Descubre nuestra gama solar","Discover our solar range",1050,49,2,5,https://example.com/content/NS-007,product_promo,Northstar
+NS-008,TikTok,@northstar_demo,2026-01-27,id,"Cara memilih ukuran baterai","How to choose the right battery size",4200,310,18,44,https://example.com/content/NS-008,education,Northstar
+NS-009,YouTube,@northstar_demo,2026-02-25,en,"Three mistakes when sizing a home system","Three mistakes when sizing a home system",3800,265,15,36,https://example.com/content/NS-009,education,Northstar
+NS-010,TikTok,@northstar_demo,2026-04-18,es,"Qué ocurre durante un corte de red","What happens during a grid outage",5200,402,22,61,https://example.com/content/NS-010,education,Northstar
+NS-011,Instagram,@northstar_demo,2026-05-03,id,"Baterai 5 kWh atau 10 kWh?","5 kWh or 10 kWh battery?",4600,350,21,55,https://example.com/content/NS-011,education,Northstar
+NS-012,TikTok,@northstar_demo,2026-03-08,id,"Berapa biaya sistem rumah?","How much does a home system cost?",3600,281,27,38,https://example.com/content/NS-012,price,Northstar
+NS-013,Instagram,@northstar_demo,2026-05-22,es,"Ejemplo de presupuesto por tamaño","Budget examples by system size",4100,329,31,49,https://example.com/content/NS-013,price,Northstar
+NS-014,TikTok,@northstar_demo,2026-04-29,en,"Safe battery installation checklist","Safe battery installation checklist",2800,190,14,25,https://example.com/content/NS-014,installation,Northstar
+NS-015,YouTube,@northstar_demo,2026-06-07,id,"Langkah pemasangan dasar","Basic installation steps",3100,210,17,29,https://example.com/content/NS-015,installation,Northstar
+NS-016,Instagram,@northstar_demo,2026-05-30,en,"A family's first month with solar storage","A family's first month with solar storage",2400,164,9,19,https://example.com/content/NS-016,case_study,Northstar
+NS-017,TikTok,@northstar_demo,2026-06-14,es,"Historia de una tienda sin cortes","Story of a shop running through outages",2700,187,11,24,https://example.com/content/NS-017,case_study,Northstar
+NS-018,Instagram,@northstar_demo,2026-06-26,en,"What our warranty covers","What our warranty covers",1800,112,8,13,https://example.com/content/NS-018,service,Northstar

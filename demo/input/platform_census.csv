@@ -1,0 +1,6 @@
+platform,handle,url,identity_status,identity_evidence,followers,visible_items,last_active_at,deep_dive,notes
+TikTok,@northstar_demo,https://example.com/northstar/tiktok,verified,website cross-link and matching domain,18400,9,2026-06-28,yes,Fictional demo account
+Instagram,@northstar_demo,https://example.com/northstar/instagram,verified,website cross-link and matching brand,9200,6,2026-06-26,yes,Fictional demo account
+YouTube,@northstar_demo,https://example.com/northstar/youtube,verified,website cross-link and matching domain,3100,3,2026-06-20,yes,Fictional demo account
+Facebook,northstar.other,https://example.com/northstar/rejected,rejected,different country language and website,87000,1200,2026-06-29,no,Same-name collision
+LinkedIn,northstar-demo,https://example.com/northstar/linkedin,probable,matching website but low activity,850,4,2026-03-02,no,Monitor only

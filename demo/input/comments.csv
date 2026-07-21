@@ -1,0 +1,17 @@
+comment_id,content_id,parent_comment_id,commenter,commenter_type,is_official,text_original,text_translation,likes,topic,response_mode,url
+C-001,NS-012,,user_001,end_customer,false,"Berapa harganya?","What is the price?",8,price,no_reply,https://example.com/comment/C-001
+C-002,NS-013,,user_002,end_customer,false,"¿Cuánto cuesta con instalación?","How much with installation?",11,price,no_reply,https://example.com/comment/C-002
+C-003,NS-011,,user_003,end_customer,false,"Harga untuk baterai 10 kWh?","Price for a 10 kWh battery?",6,price,no_reply,https://example.com/comment/C-003
+C-004,NS-008,,user_004,end_customer,false,"Can you share a price list?","Can you share a price list?",5,price,no_reply,https://example.com/comment/C-004
+C-005,NS-008,,user_005,end_customer,false,"Apakah 5 kWh cukup untuk rumah?","Is 5 kWh enough for a home?",9,sizing,no_reply,https://example.com/comment/C-005
+C-006,NS-009,,user_006,installer_diy,false,"How do I size for two air conditioners?","How do I size for two air conditioners?",7,sizing,no_reply,https://example.com/comment/C-006
+C-007,NS-014,,user_007,installer_diy,false,"Which breaker rating is required?","Which breaker rating is required?",4,installation,no_reply,https://example.com/comment/C-007
+C-008,NS-015,,user_008,installer_diy,false,"¿Tienen diagrama de cableado?","Do you have a wiring diagram?",5,installation,no_reply,https://example.com/comment/C-008
+C-009,NS-010,,user_009,installer_diy,false,"Is this compatible with third-party BMS?","Is this compatible with third-party BMS?",3,compatibility,no_reply,https://example.com/comment/C-009
+C-010,NS-011,,user_010,reseller,false,"Protocol support for existing inverters?","Protocol support for existing inverters?",2,compatibility,no_reply,https://example.com/comment/C-010
+C-011,NS-018,,user_011,end_customer,false,"How long is the battery warranty?","How long is the battery warranty?",4,warranty,no_reply,https://example.com/comment/C-011
+C-012,NS-013,,user_012,end_customer,false,"Do you deliver outside the capital?","Do you deliver outside the capital?",3,delivery,no_reply,https://example.com/comment/C-012
+C-013,NS-012,C-001,@northstar_demo,unknown,true,"Silakan kirim pesan langsung","Please send us a direct message",1,price,redirect,https://example.com/comment/C-013
+C-014,NS-014,C-007,@northstar_demo,unknown,true,"Please contact our support line","Please contact our support line",1,installation,redirect,https://example.com/comment/C-014
+C-015,NS-018,C-011,@northstar_demo,unknown,true,"The battery warranty is ten years under the published terms.","The battery warranty is ten years under the published terms.",2,warranty,useful_answer,https://example.com/comment/C-015
+C-016,NS-010,C-009,@northstar_demo,unknown,true,"Thanks for your interest!","Thanks for your interest!",0,compatibility,template,https://example.com/comment/C-016

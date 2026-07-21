@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="600" viewBox="0 0 1600 600" role="img" aria-label="Competitor Census: public signals to traceable strategy">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#071a2c"/><stop offset=".58" stop-color="#123a59"/><stop offset="1" stop-color="#1f5272"/></linearGradient>
+    <radialGradient id="glow"><stop stop-color="#d49a43" stop-opacity=".24"/><stop offset="1" stop-color="#d49a43" stop-opacity="0"/></radialGradient>
+  </defs>
+  <rect width="1600" height="600" rx="36" fill="url(#bg)"/>
+  <circle cx="1320" cy="130" r="410" fill="url(#glow)"/>
+  <g opacity=".16" stroke="#b9cfdd" fill="none">
+    <circle cx="1320" cy="270" r="76"/><circle cx="1320" cy="270" r="143"/><circle cx="1320" cy="270" r="212"/>
+    <path d="M1080 270h480M1320 30v480"/>
+  </g>
+  <g transform="translate(1158 108)">
+    <circle cx="162" cy="162" r="104" fill="#0d2a42" stroke="#fff" stroke-width="14"/>
+    <path d="M234 234 328 328" stroke="#d49a43" stroke-width="25" stroke-linecap="round"/>
+    <path d="M102 190h35v-61h37v61h35V92h36" fill="none" stroke="#d49a43" stroke-width="18" stroke-linejoin="round"/>
+  </g>
+  <text x="92" y="104" fill="#e6ac51" font-family="Inter,Arial,sans-serif" font-size="20" font-weight="700" letter-spacing="7">OPEN COMPETITIVE INTELLIGENCE</text>
+  <text x="92" y="226" fill="#ffffff" font-family="Inter,Arial,sans-serif" font-size="86" font-weight="750" letter-spacing="-3">Competitor Census</text>
+  <text x="92" y="298" fill="#d7e4eb" font-family="Inter,Arial,sans-serif" font-size="34">Census first. Conclusions second.</text>
+  <text x="92" y="354" fill="#9eb5c4" font-family="Inter,Arial,sans-serif" font-size="23">Turn public competitor channels into a traceable dataset and strategy report.</text>
+  <g transform="translate(92 414)" font-family="Inter,Arial,sans-serif" font-size="17" font-weight="650">
+    <rect width="184" height="48" rx="24" fill="none" stroke="#55758b"/><text x="28" y="31" fill="#eef5f8">AGENT SKILL</text>
+    <rect x="198" width="220" height="48" rx="24" fill="none" stroke="#55758b"/><text x="226" y="31" fill="#eef5f8">ZERO DEPENDENCIES</text>
+    <rect x="432" width="226" height="48" rx="24" fill="none" stroke="#55758b"/><text x="460" y="31" fill="#eef5f8">EVIDENCE-LINKED</text>
+  </g>
+  <g transform="translate(92 518)" font-family="Inter,Arial,sans-serif" font-size="17">
+    <text fill="#e6ac51" font-weight="700">DISCOVER</text><path d="M104 0h65" stroke="#54758b"/>
+    <text x="186" fill="#e6ac51" font-weight="700">CAPTURE</text><path d="M281 0h65" stroke="#54758b"/>
+    <text x="363" fill="#e6ac51" font-weight="700">TRANSLATE</text><path d="M468 0h65" stroke="#54758b"/>
+    <text x="550" fill="#e6ac51" font-weight="700">ANALYZE</text><path d="M638 0h65" stroke="#54758b"/>
+    <text x="720" fill="#e6ac51" font-weight="700">REPORT</text>
+  </g>
+</svg>
