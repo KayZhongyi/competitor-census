@@ -4,7 +4,7 @@
 
 # Competitor Census｜竞品公开信息普查
 
-这是一个可安装的 Agent Skill 与公开工具包：先普查竞品真正活跃的平台，再对声明范围内的公开内容做尽可能完整的采集，保留发布日期、播放量、点赞、评论、分享、原文、译文与链接，最后生成每条结论都能回到证据的竞品报告。v0.2 已加入可实际运行的 YouTube 公开元数据采集器，并保留零依赖离线 Demo。
+这是一个可安装的 Agent Skill 与公开工具包：先普查竞品真正活跃的平台，再对声明范围内的公开内容做尽可能完整的采集，保留发布日期、播放量、点赞、评论、分享、原文、译文与链接，最后生成每条结论都能回到证据的竞品报告。v0.3 已打通模型无关的 Agent 分析回填与严格校验闭环，并保留真实可运行的 YouTube 采集器和零依赖离线 Demo。
 
 核心原则是：**先普查、后深挖；先证据、后结论。**
 
@@ -40,6 +40,26 @@ python3 scripts/collect_youtube.py \
 ```
 
 采集器不会下载视频文件。它会在公开页面可提供的范围内记录视频 ID、发布日期、标题与简介、时长、播放量、点赞数、可见评论数、账号字段和原始链接。翻译与内容类型暂时留空，由 Agent 读取真实语料后自下而上完成，避免用关键词预设分类。
+
+## 用任意 Agent 完成分析闭环
+
+每次 YouTube 采集都会自动生成 `analysis/analysis_task.md`、分类体系模板和逐条分析模板。让 Claude Code、Codex 或其他能读写文件的 Agent 按任务文件完成分析后，运行：
+
+```bash
+python3 scripts/apply_analysis.py --bundle runs/openai
+```
+
+完整链路为：
+
+```text
+不可变的 content.csv
+  → Agent 通读完整语料
+  → taxonomy.json + analysis_results.csv
+  → 确定性校验
+  → analyzed_content.csv + 可追溯分析报告
+```
+
+校验器要求每个源 ID 恰好对应一条译文和一个已声明类别，并检查输入文件指纹、缺失/重复/未知 ID、分类体系定义、置信度和代表性证据。只有全部通过后才会生成 `analysis_report.html`，原始 `content.csv` 始终不被覆盖。文件规范见 [`references/analysis-handoff.md`](references/analysis-handoff.md)。
 
 ## 60 秒离线体验
 

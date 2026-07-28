@@ -106,7 +106,10 @@ print(json.dumps(record))
             self.assertEqual(manifest["counts"]["unique_content"], 2)
             self.assertIn("Comments not included", report)
             self.assertIn("content classification are intentionally pending", report)
+            self.assertTrue((output / "analysis/analysis_task.md").exists())
+            self.assertTrue((output / "analysis/analysis_results.csv").exists())
             self.assertIn("Captured 2 unique public video records", result.stdout)
+            self.assertIn("Next Agent task", result.stdout)
 
 
 if __name__ == "__main__":

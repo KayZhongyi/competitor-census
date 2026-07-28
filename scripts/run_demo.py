@@ -107,19 +107,23 @@ def analyze(
     if orphaned:
         raise ValueError(f"comments: unknown content_id: {', '.join(orphaned)}")
 
-    by_type: dict[str, list[int]] = defaultdict(list)
+    by_type: dict[str, list[dict[str, str]]] = defaultdict(list)
     for row in content:
-        by_type[row["content_type"] or "unclassified"].append(number(row["views"]))
+        by_type[row["content_type"] or "unclassified"].append(row)
 
     category_stats = []
-    for category, values in by_type.items():
+    for category, rows in by_type.items():
+        values = [number(row["views"]) for row in rows if row.get("views", "").strip()]
+        ranked_rows = sorted(rows, key=lambda row: number(row["views"]), reverse=True)
         category_stats.append(
             {
                 "category": category,
-                "count": len(values),
-                "share": len(values) / len(content),
-                "mean_views": round(statistics.mean(values)),
-                "median_views": round(statistics.median(values)),
+                "count": len(rows),
+                "share": len(rows) / len(content),
+                "mean_views": round(statistics.mean(values)) if values else 0,
+                "median_views": round(statistics.median(values)) if values else 0,
+                "view_coverage": len(values),
+                "evidence_ids": [row["record_id"] for row in ranked_rows[:3]],
             }
         )
     category_stats.sort(key=lambda item: (-int(item["mean_views"]), str(item["category"])))
@@ -197,6 +201,7 @@ def render_report(summary: dict[str, object]) -> str:
           <td>{int(item['mean_views']):,}</td>
           <td>{int(item['median_views']):,}</td>
           <td><div class="bar"><i style="width:{int(item['mean_views']) / max_views * 100:.1f}%"></i></div></td>
+          <td>{', '.join(f'<code>{html.escape(str(record_id))}</code>' for record_id in item['evidence_ids'])}</td>
         </tr>"""
         for item in categories
     )
@@ -252,8 +257,8 @@ def render_report(summary: dict[str, object]) -> str:
     else:
         top_topic = str(summary["top_topic"] or "not captured").replace("_", " ")
         findings = f"""
-        <article><b>{str(best['category']).replace('_',' ').title()}</b>Highest mean reach at {int(best['mean_views']):,} views across {best['count']} records.</article>
-        <article><b>{str(most_published['category']).replace('_',' ').title()}</b>Largest publishing share at {pct(float(most_published['share']))}; compare supply with performance.</article>
+        <article><b>{str(best['category']).replace('_',' ').title()}</b>Highest mean reach at {int(best['mean_views']):,} views across {best['count']} records. Evidence: {', '.join(best['evidence_ids'])}.</article>
+        <article><b>{str(most_published['category']).replace('_',' ').title()}</b>Largest publishing share at {pct(float(most_published['share']))} ({most_published['count']}/{summary['content_rows']}). Evidence: {', '.join(most_published['evidence_ids'])}.</article>
         <article><b>{top_topic.title()}</b>Most frequent user topic: {topic_counts.get(summary['top_topic'], 0)}/{summary['user_comments']} non-official comments.</article>"""
         analysis_note = (
             "These are descriptive patterns in the captured public corpus. "
@@ -355,7 +360,7 @@ def render_report(summary: dict[str, object]) -> str:
     <section>
       <h2>Content supply vs. performance</h2>
       <p class="sub">Mean and median are shown together to reduce distortion from outliers.</p>
-      <div class="table-wrap"><table><thead><tr><th>Category</th><th>n</th><th>Share</th><th>Mean views</th><th>Median</th><th>Relative reach</th></tr></thead><tbody>{category_rows}</tbody></table></div>
+      <div class="table-wrap"><table><thead><tr><th>Category</th><th>n</th><th>Share</th><th>Mean views</th><th>Median</th><th>Relative reach</th><th>Evidence IDs</th></tr></thead><tbody>{category_rows}</tbody></table></div>
     </section>
 
 {comment_section}

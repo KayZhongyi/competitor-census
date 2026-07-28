@@ -417,6 +417,22 @@ def build_report(output_dir: Path, company: str) -> None:
     )
 
 
+def prepare_analysis_packet(output_dir: Path) -> Path:
+    task_path = output_dir / "analysis" / "analysis_task.md"
+    if task_path.exists():
+        return task_path
+    subprocess.run(
+        [
+            sys.executable,
+            str(ROOT / "scripts/prepare_analysis.py"),
+            "--bundle",
+            str(output_dir),
+        ],
+        check=True,
+    )
+    return task_path
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--company", required=True, help="Company or target label used in output")
@@ -445,6 +461,11 @@ def parse_args() -> argparse.Namespace:
         help="Delay between metadata requests in seconds (default: 0.75)",
     )
     parser.add_argument("--no-report", action="store_true", help="Write evidence bundle only")
+    parser.add_argument(
+        "--no-analysis-packet",
+        action="store_true",
+        help="Skip the model-agnostic Agent analysis handoff files",
+    )
     return parser.parse_args()
 
 
@@ -496,12 +517,17 @@ def main() -> int:
     )
     if not args.no_report:
         build_report(output_dir, args.company)
+    analysis_task = None
+    if not args.no_analysis_packet:
+        analysis_task = prepare_analysis_packet(output_dir)
 
     print(f"Captured {row_count} unique public video records.")
     print(f"Evidence bundle: {output_dir}")
     print(f"Manifest: {manifest_path}")
     if not args.no_report:
         print(f"Report: {output_dir / 'report.html'}")
+    if analysis_task:
+        print(f"Next Agent task: {analysis_task}")
     return 0
 
 

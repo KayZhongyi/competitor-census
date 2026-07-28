@@ -40,7 +40,9 @@ Required demo fields:
 
 Production bundles should also include `collected_at`, `retrieval_status`, `media_type`, and `classification_notes`.
 
-The v0.2 YouTube adapter additionally writes `duration_seconds`, `channel_id`, `availability`, and `source_tab`. It leaves `text_translation` blank and `content_type` as `unclassified` until the Agent analysis phase. Platform fields that are not publicly exposed at collection time remain blank rather than becoming zero.
+The YouTube adapter additionally writes `duration_seconds`, `channel_id`, `availability`, and `source_tab`. It leaves `text_translation` blank and `content_type` as `unclassified` until the Agent analysis phase. Platform fields that are not publicly exposed at collection time remain blank rather than becoming zero.
+
+The v0.3 analysis handoff keeps this file unchanged. Agent output is validated separately, then merged into `analyzed_content.csv` with `classification_confidence` and `classification_notes`. See [analysis-handoff.md](analysis-handoff.md).
 
 ## `comments.csv`
 

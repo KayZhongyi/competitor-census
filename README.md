@@ -9,7 +9,7 @@
   <a href="README.zh-CN.md">中文</a>
 </p>
 
-**Competitor Census** is an agent skill and open toolkit that turns public competitor channels into a structured evidence bundle and an evidence-linked strategy report. v0.2 includes a live YouTube metadata adapter plus a zero-dependency offline demo.
+**Competitor Census** is an agent skill and open toolkit that turns public competitor channels into a structured evidence bundle and an evidence-linked strategy report. v0.3 adds a model-agnostic Agent analysis handoff with strict validation, while retaining the live YouTube adapter and zero-dependency offline demo.
 
 It is built around one idea: **census first, conclusions second**. Discover the channels that matter, capture the in-scope public corpus, preserve dates and engagement metrics, translate multilingual content, analyze patterns, and keep every claim traceable to its source.
 
@@ -49,6 +49,26 @@ python3 scripts/collect_youtube.py \
 The adapter opens public video metadata but never downloads the media. It captures stable ID, publication date, title and description, duration, views, likes, visible comment count, channel identity fields, availability, and source URL where available. Large histories take time; platform-visible fields can be blank.
 
 It deliberately leaves translation and content type unclassified. The Agent derives those fields from the real corpus instead of forcing preset keyword labels.
+
+## Close the analysis loop with any Agent
+
+Every YouTube run now creates `analysis/analysis_task.md` plus editable taxonomy and row-result templates. Ask Claude Code, Codex, or another file-capable Agent to follow that task, then validate and merge its work:
+
+```bash
+python3 scripts/apply_analysis.py --bundle runs/openai
+```
+
+The workflow is deliberately provider-neutral:
+
+```text
+immutable content.csv
+  → Agent reads the complete corpus
+  → taxonomy.json + analysis_results.csv
+  → deterministic validation
+  → analyzed_content.csv + evidence-linked report
+```
+
+The validator requires exactly one translation and declared category for every source ID. It checks the input fingerprint, rejects missing/duplicate/unknown IDs and malformed taxonomies, verifies representative evidence, and writes `analysis_report.html` only after the result passes. The raw `content.csv` is never overwritten. See [`references/analysis-handoff.md`](references/analysis-handoff.md) for the file contract.
 
 ## See the offline demo in 60 seconds
 
@@ -134,9 +154,12 @@ competitor-census/
 ├── agents/openai.yaml               # Codex skill metadata
 ├── demo/input/                      # Fictional, public-safe evidence bundle
 ├── scripts/collect_youtube.py       # Live public YouTube metadata adapter
+├── scripts/prepare_analysis.py      # Fingerprinted, model-agnostic Agent handoff
+├── scripts/apply_analysis.py        # Validate, merge, and render analyzed output
 ├── scripts/run_demo.py              # Generic evidence validator/report generator
 ├── references/
 │   ├── analysis-playbook.md
+│   ├── analysis-handoff.md
 │   ├── collection-safety.md
 │   ├── data-schema.md
 │   └── youtube-adapter.md
@@ -153,9 +176,10 @@ The project does **not** bypass CAPTCHA, authentication, rate limits, or platfor
 ## Roadmap
 
 - [x] Live YouTube public-metadata adapter
+- [x] Model-agnostic translation/classification handoff with strict validation
 - [ ] Generic adapter interface and starter browser collectors
 - [ ] Incremental update and change-detection mode
-- [ ] Pluggable translation and classification providers
+- [ ] Optional direct API providers for translation and classification
 - [ ] DOCX/PDF report themes
 - [ ] Cross-competitor comparison after individual dossiers are complete
 
