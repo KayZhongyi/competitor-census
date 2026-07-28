@@ -4,11 +4,44 @@
 
 # Competitor Census｜竞品公开信息普查
 
-这是一个可安装的 Agent Skill 与零依赖工具包：先普查竞品真正活跃的平台，再对声明范围内的公开内容做尽可能完整的采集，保留发布日期、播放量、点赞、评论、分享、原文、译文与链接，最后生成每条结论都能回到证据的竞品报告。
+这是一个可安装的 Agent Skill 与公开工具包：先普查竞品真正活跃的平台，再对声明范围内的公开内容做尽可能完整的采集，保留发布日期、播放量、点赞、评论、分享、原文、译文与链接，最后生成每条结论都能回到证据的竞品报告。v0.2 已加入可实际运行的 YouTube 公开元数据采集器，并保留零依赖离线 Demo。
 
 核心原则是：**先普查、后深挖；先证据、后结论。**
 
-## 60 秒体验
+## 真实 YouTube 频道试跑
+
+先安装最新版 [`yt-dlp`](https://github.com/yt-dlp/yt-dlp/wiki/Installation)：
+
+```bash
+git clone https://github.com/KayZhongyi/competitor-census.git
+cd competitor-census
+python3 -m pip install -U "yt-dlp[default]"
+python3 scripts/collect_youtube.py \
+  --company "OpenAI" \
+  --channel "https://www.youtube.com/@OpenAI" \
+  --tabs videos \
+  --max-items-per-tab 10
+```
+
+运行后打开 `runs/openai/report.html`。同一目录还会生成内容 CSV、平台普查表、JSON 摘要和记录范围/局限的 Manifest。试跑成功后，把公司名和频道地址替换成目标友商。
+
+<p align="center">
+  <img src="assets/youtube-live-demo.gif" alt="从 YouTube 公开元数据采集到证据库与报告" width="100%" />
+</p>
+
+确认账号和字段无误后，可对所选公开标签页做尽可能完整的采集：
+
+```bash
+python3 scripts/collect_youtube.py \
+  --company "目标公司" \
+  --channel "https://www.youtube.com/@TargetHandle" \
+  --tabs videos,shorts,streams \
+  --max-items-per-tab 0
+```
+
+采集器不会下载视频文件。它会在公开页面可提供的范围内记录视频 ID、发布日期、标题与简介、时长、播放量、点赞数、可见评论数、账号字段和原始链接。翻译与内容类型暂时留空，由 Agent 读取真实语料后自下而上完成，避免用关键词预设分类。
+
+## 60 秒离线体验
 
 无需 API Key、浏览器登录或安装第三方包：
 

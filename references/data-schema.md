@@ -40,7 +40,11 @@ Required demo fields:
 
 Production bundles should also include `collected_at`, `retrieval_status`, `media_type`, and `classification_notes`.
 
+The v0.2 YouTube adapter additionally writes `duration_seconds`, `channel_id`, `availability`, and `source_tab`. It leaves `text_translation` blank and `content_type` as `unclassified` until the Agent analysis phase. Platform fields that are not publicly exposed at collection time remain blank rather than becoming zero.
+
 ## `comments.csv`
+
+Keep the header even when an adapter does not collect comments. An empty table means “not collected,” not “the content received zero comments.”
 
 | Field | Meaning |
 |---|---|

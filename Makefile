@@ -1,4 +1,4 @@
-.PHONY: demo test validate
+.PHONY: demo test validate youtube-help
 
 demo:
 	python3 scripts/run_demo.py
@@ -8,3 +8,6 @@ test:
 
 validate: test
 	python3 scripts/run_demo.py --quiet
+
+youtube-help:
+	python3 scripts/collect_youtube.py --help

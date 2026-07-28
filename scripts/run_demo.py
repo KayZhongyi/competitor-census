@@ -59,7 +59,9 @@ CENSUS_FIELDS = {
 }
 
 
-def load_csv(path: Path, required: set[str]) -> list[dict[str, str]]:
+def load_csv(
+    path: Path, required: set[str], allow_empty: bool = False
+) -> list[dict[str, str]]:
     with path.open("r", encoding="utf-8-sig", newline="") as handle:
         reader = csv.DictReader(handle)
         fields = set(reader.fieldnames or [])
@@ -67,7 +69,7 @@ def load_csv(path: Path, required: set[str]) -> list[dict[str, str]]:
         if missing:
             raise ValueError(f"{path}: missing columns: {', '.join(missing)}")
         rows = list(reader)
-    if not rows:
+    if not rows and not allow_empty:
         raise ValueError(f"{path}: dataset is empty")
     return rows
 
@@ -85,10 +87,17 @@ def ensure_unique(rows: Iterable[dict[str, str]], key: str, label: str) -> None:
         raise ValueError(f"{label}: duplicate {key}: {', '.join(duplicates)}")
 
 
+def working_text(row: dict[str, str]) -> str:
+    value = row.get("text_translation", "").strip() or row.get("text_original", "").strip()
+    return value.splitlines()[0][:180]
+
+
 def analyze(
     census: list[dict[str, str]],
     content: list[dict[str, str]],
     comments: list[dict[str, str]],
+    dataset_label: str,
+    dataset_kind: str,
 ) -> dict[str, object]:
     ensure_unique(content, "record_id", "content")
     ensure_unique(comments, "comment_id", "comments")
@@ -100,7 +109,7 @@ def analyze(
 
     by_type: dict[str, list[int]] = defaultdict(list)
     for row in content:
-        by_type[row["content_type"]].append(number(row["views"]))
+        by_type[row["content_type"] or "unclassified"].append(number(row["views"]))
 
     category_stats = []
     for category, values in by_type.items():
@@ -121,30 +130,41 @@ def analyze(
     response_counts = Counter(row["response_mode"] for row in official_replies if row["response_mode"])
     platforms = Counter(row["platform"] for row in content)
     selected_channels = [row for row in census if row["deep_dive"].lower() == "yes"]
-    evidence = sorted(content, key=lambda row: number(row["views"]), reverse=True)[:6]
+    evidence = sorted(content, key=lambda row: number(row["views"]), reverse=True)[:8]
+    views = [number(row["views"]) for row in content if row.get("views", "").strip()]
 
     return {
         "generated_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
-        "dataset": "Fictional Northstar Home Energy demo",
+        "dataset": dataset_label,
+        "dataset_kind": dataset_kind,
         "census_channels": len(census),
         "deep_dive_channels": len(selected_channels),
         "content_rows": len(content),
         "comment_rows": len(comments),
         "user_comments": len(user_comments),
         "official_replies": len(official_replies),
-        "total_views": sum(number(row["views"]) for row in content),
+        "total_views": sum(views),
+        "mean_views": round(statistics.mean(views)) if views else 0,
+        "median_views": round(statistics.median(views)) if views else 0,
+        "view_coverage": len(views),
         "platforms": dict(sorted(platforms.items())),
         "category_stats": category_stats,
         "topic_counts": dict(topic_counts.most_common()),
         "response_counts": dict(response_counts.most_common()),
         "top_topic": topic_counts.most_common(1)[0][0] if topic_counts else None,
+        "unclassified_only": set(by_type) == {"unclassified"},
         "evidence": [
             {
                 "record_id": row["record_id"],
                 "platform": row["platform"],
                 "published_at": row["published_at"],
-                "translation": row["text_translation"],
+                "text": working_text(row),
                 "views": number(row["views"]),
+                "views_available": bool(row["views"].strip()),
+                "likes": number(row["likes"]),
+                "likes_available": bool(row["likes"].strip()),
+                "comments": number(row["comments_count"]),
+                "comments_available": bool(row["comments_count"].strip()),
                 "url": row["url"],
             }
             for row in evidence
@@ -156,10 +176,17 @@ def pct(value: float) -> str:
     return f"{value * 100:.0f}%"
 
 
+def display_metric(row: dict[str, object], field: str) -> str:
+    return f"{int(row[field]):,}" if row.get(f"{field}_available") else "n/a"
+
+
 def render_report(summary: dict[str, object]) -> str:
     categories = summary["category_stats"]
     assert isinstance(categories, list)
     max_views = max(int(item["mean_views"]) for item in categories) or 1
+    dataset = html.escape(str(summary["dataset"]))
+    is_live = summary["dataset_kind"] == "live"
+    unclassified_only = bool(summary["unclassified_only"])
 
     category_rows = "\n".join(
         f"""
@@ -198,65 +225,116 @@ def render_report(summary: dict[str, object]) -> str:
           <td><code>{html.escape(str(row['record_id']))}</code></td>
           <td>{html.escape(str(row['platform']))}</td>
           <td>{html.escape(str(row['published_at']))}</td>
-          <td>{html.escape(str(row['translation']))}</td>
-          <td>{int(row['views']):,}</td>
+          <td>{html.escape(str(row['text']))}</td>
+          <td>{display_metric(row, 'views')}</td>
+          <td>{display_metric(row, 'likes')}</td>
+          <td>{display_metric(row, 'comments')}</td>
           <td><a href="{html.escape(str(row['url']), quote=True)}">source ↗</a></td>
         </tr>"""
         for row in evidence
     )
 
-    best = categories[0]
-    most_published = max(categories, key=lambda item: int(item["count"]))
-    top_topic = str(summary["top_topic"] or "none").replace("_", " ")
     platforms = summary["platforms"]
     assert isinstance(platforms, dict)
+    top_record = evidence[0]
+    best = categories[0]
+    most_published = max(categories, key=lambda item: int(item["count"]))
+
+    if unclassified_only:
+        findings = f"""
+        <article><b>{summary['content_rows']} records</b>Captured in the declared public scope; inspect the run manifest before calling it complete.</article>
+        <article><b>{int(summary['median_views']):,} median views</b>Mean reach is {int(summary['mean_views']):,} across {summary['view_coverage']} records with visible view counts.</article>
+        <article><b>{int(top_record['views']):,} views</b>Highest-reach captured item is <code>{html.escape(str(top_record['record_id']))}</code>.</article>"""
+        analysis_note = (
+            "Translation and content classification are intentionally pending. "
+            "Run the Agent analysis phase to derive categories from the corpus before making strategy claims."
+        )
+    else:
+        top_topic = str(summary["top_topic"] or "not captured").replace("_", " ")
+        findings = f"""
+        <article><b>{str(best['category']).replace('_',' ').title()}</b>Highest mean reach at {int(best['mean_views']):,} views across {best['count']} records.</article>
+        <article><b>{str(most_published['category']).replace('_',' ').title()}</b>Largest publishing share at {pct(float(most_published['share']))}; compare supply with performance.</article>
+        <article><b>{top_topic.title()}</b>Most frequent user topic: {topic_counts.get(summary['top_topic'], 0)}/{summary['user_comments']} non-official comments.</article>"""
+        analysis_note = (
+            "These are descriptive patterns in the captured public corpus. "
+            "Treat opportunities as testable hypotheses, not proof of sales impact or causality."
+        )
+
+    if summary["comment_rows"]:
+        comment_section = f"""
+        <section>
+          <h2>Voice of customer</h2>
+          <p class="sub">Official replies are excluded from customer-demand counts.</p>
+          <div class="chips">{topic_chips}</div>
+          <p class="note"><b>Visible official response modes:</b> {html.escape(response_text or 'none classified')}. A redirect is counted separately from a useful public answer.</p>
+        </section>"""
+    else:
+        comment_section = """
+        <section>
+          <h2>Comments not included</h2>
+          <p class="sub">This evidence bundle contains content metadata only.</p>
+          <p>The v0.2 YouTube adapter does not collect comments or replies. Add them through an authorized adapter before drawing conclusions about customer demand or official response behavior.</p>
+        </section>"""
+
+    eyebrow = "LIVE PUBLIC METADATA RUN" if is_live else "PUBLIC-SAFE OFFLINE DEMO"
+    hero_copy = (
+        "A live public-metadata run converted source records into a schema-validated evidence bundle and source-linked baseline report."
+        if is_live
+        else "A fictional example showing how public channel records become a validated evidence bundle and source-linked report."
+    )
+    scope_copy = (
+        "This report reflects a point-in-time, best-effort public metadata capture. Check run_manifest.json for selected tabs, limits, failures, unavailable fields, and cutoff time. Account identity remains a human verification step."
+        if is_live
+        else "This is a deliberately small, fictional dataset used to demonstrate the workflow."
+    )
 
     return f"""<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Competitor Census — Fictional Demo</title>
+  <title>{dataset} · Competitor Census</title>
   <style>
-    :root {{ --ink:#0b2239; --blue:#163c5c; --gold:#d49a43; --paper:#f4f7f9; --muted:#637485; --line:#d9e2e8; }}
+    :root {{ --ink:#0b2239; --gold:#d49a43; --paper:#f4f7f9; --muted:#637485; --line:#d9e2e8; }}
     * {{ box-sizing:border-box; }}
     body {{ margin:0; color:var(--ink); background:var(--paper); font:15px/1.6 Inter, ui-sans-serif, system-ui, sans-serif; }}
     a {{ color:#0e668c; text-decoration:none; }}
-    .hero {{ background:linear-gradient(120deg,#081d31,#173e5d); color:white; padding:72px 7vw 64px; border-bottom:4px solid var(--gold); }}
-    .eyebrow {{ color:#e9b45f; text-transform:uppercase; letter-spacing:.18em; font-size:12px; font-weight:800; }}
-    h1 {{ max-width:900px; margin:14px 0 12px; font-size:clamp(38px,6vw,72px); line-height:1.02; letter-spacing:-.04em; }}
-    .hero p {{ max-width:850px; color:#d7e1e8; font-size:18px; }}
+    .hero {{ background:#0b2239; color:white; padding:66px 7vw 78px; border-bottom:4px solid var(--gold); }}
+    .eyebrow {{ color:#e9b45f; text-transform:uppercase; letter-spacing:.16em; font-size:12px; font-weight:800; overflow-wrap:anywhere; }}
+    h1 {{ max-width:950px; margin:14px 0 12px; font-size:clamp(36px,6vw,68px); line-height:1.05; letter-spacing:0; overflow-wrap:anywhere; }}
+    .hero p {{ max-width:850px; color:#d7e1e8; font-size:18px; overflow-wrap:anywhere; }}
     .scope {{ display:flex; flex-wrap:wrap; gap:9px; margin-top:24px; }}
     .scope span {{ border:1px solid #537088; border-radius:999px; padding:6px 12px; color:#e8eff4; font-size:13px; }}
     main {{ max-width:1180px; margin:auto; padding:42px 24px 80px; }}
-    .metrics {{ display:grid; grid-template-columns:repeat(5,1fr); gap:12px; margin-top:-72px; position:relative; }}
-    .metric {{ background:white; border:1px solid var(--line); border-radius:16px; padding:20px; box-shadow:0 12px 30px #09233b14; }}
-    .metric b {{ display:block; font-size:30px; letter-spacing:-.04em; }}
-    .metric span {{ color:var(--muted); font-size:12px; text-transform:uppercase; letter-spacing:.08em; }}
-    section {{ background:white; border:1px solid var(--line); border-radius:18px; padding:28px; margin-top:20px; }}
-    h2 {{ margin:0 0 6px; font-size:24px; letter-spacing:-.02em; }}
+    .metrics {{ display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:12px; margin-top:-78px; position:relative; }}
+    .metric {{ background:white; border:1px solid var(--line); border-radius:8px; padding:20px; box-shadow:0 12px 30px #09233b14; min-width:0; }}
+    .metric b {{ display:block; font-size:30px; letter-spacing:0; overflow-wrap:anywhere; }}
+    .metric span {{ display:block; color:var(--muted); font-size:12px; text-transform:uppercase; letter-spacing:.08em; overflow-wrap:anywhere; }}
+    section {{ background:white; border:1px solid var(--line); border-radius:8px; padding:28px; margin-top:20px; }}
+    h2 {{ margin:0 0 6px; font-size:24px; letter-spacing:0; }}
     .sub {{ color:var(--muted); margin:0 0 22px; }}
-    .finding {{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:18px; }}
-    .finding article {{ background:#f7f9fb; border-left:4px solid var(--gold); border-radius:9px; padding:16px; }}
-    .finding b {{ display:block; font-size:21px; }}
-    table {{ width:100%; border-collapse:collapse; font-size:13px; }}
+    .finding {{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; margin-top:18px; }}
+    .finding article {{ background:#f7f9fb; border-left:4px solid var(--gold); border-radius:6px; padding:16px; min-width:0; }}
+    .finding b {{ display:block; font-size:21px; overflow-wrap:anywhere; }}
+    .table-wrap {{ overflow-x:auto; }}
+    table {{ width:100%; border-collapse:collapse; font-size:13px; min-width:760px; }}
     th {{ color:var(--muted); text-transform:uppercase; letter-spacing:.06em; font-size:11px; text-align:left; }}
     th, td {{ border-bottom:1px solid var(--line); padding:11px 9px; vertical-align:top; }}
-    .bar {{ width:130px; height:8px; background:#e8eef2; border-radius:9px; overflow:hidden; }}
-    .bar i {{ display:block; height:100%; background:linear-gradient(90deg,var(--gold),#f1c272); }}
+    .bar {{ width:130px; height:8px; background:#e8eef2; border-radius:4px; overflow:hidden; }}
+    .bar i {{ display:block; height:100%; background:var(--gold); }}
     .chips {{ display:flex; flex-wrap:wrap; gap:9px; }}
     .chip {{ background:#edf3f6; border-radius:999px; padding:7px 12px; }}
-    .note {{ border:1px solid #ecd09e; background:#fff9ef; padding:14px 16px; border-radius:10px; margin-top:18px; color:#6c4a18; }}
+    .note {{ border:1px solid #ecd09e; background:#fff9ef; padding:14px 16px; border-radius:6px; margin-top:18px; color:#6c4a18; }}
     footer {{ color:var(--muted); text-align:center; padding:28px; }}
-    @media (max-width:820px) {{ .metrics {{ grid-template-columns:repeat(2,1fr); margin-top:-40px; }} .finding {{ grid-template-columns:1fr; }} section {{ overflow-x:auto; }} }}
+    @media (max-width:820px) {{ .metrics {{ grid-template-columns:repeat(2,minmax(0,1fr)); margin-top:-48px; }} .finding {{ grid-template-columns:1fr; }} .hero {{ padding-bottom:60px; }} }}
   </style>
 </head>
 <body>
   <header class="hero">
-    <div class="eyebrow">Competitor Census · public-safe offline demo</div>
-    <h1>Evidence before conclusions.</h1>
-    <p>A fictional example showing how public channel records become a validated evidence bundle, quantitative findings, and source-linked strategy notes.</p>
-    <div class="scope"><span>Fictional company</span><span>5 channels audited</span><span>3 channels deep-dived</span><span>No API key</span><span>No live scraping</span></div>
+    <div class="eyebrow">Competitor Census · {eyebrow}</div>
+    <h1>{dataset}</h1>
+    <p>{hero_copy}</p>
+    <div class="scope"><span>Evidence bundle first</span><span>Point-in-time metrics</span><span>Source-linked</span><span>Human-verified conclusions</span></div>
   </header>
   <main>
     <div class="metrics">
@@ -270,36 +348,27 @@ def render_report(summary: dict[str, object]) -> str:
     <section>
       <h2>What the evidence says</h2>
       <p class="sub">Observations are separated from interpretation. Counts and denominators remain visible.</p>
-      <div class="finding">
-        <article><b>{str(best['category']).replace('_',' ').title()}</b>Highest mean reach at {int(best['mean_views']):,} views across {best['count']} records.</article>
-        <article><b>{str(most_published['category']).replace('_',' ').title()}</b>Largest publishing share at {pct(float(most_published['share']))}, creating a visible supply–performance gap.</article>
-        <article><b>{top_topic.title()}</b>Most frequent user topic: {topic_counts.get(summary['top_topic'], 0)}/{summary['user_comments']} non-official comments.</article>
-      </div>
-      <div class="note"><b>Interpretation:</b> the fictional competitor publishes most often about products, while educational and price content earns stronger reach. Treat this as a testable content hypothesis—not proof of sales impact.</div>
+      <div class="finding">{findings}</div>
+      <div class="note"><b>Interpretation boundary:</b> {analysis_note}</div>
     </section>
 
     <section>
       <h2>Content supply vs. performance</h2>
       <p class="sub">Mean and median are shown together to reduce distortion from outliers.</p>
-      <table><thead><tr><th>Category</th><th>n</th><th>Share</th><th>Mean views</th><th>Median</th><th>Relative reach</th></tr></thead><tbody>{category_rows}</tbody></table>
+      <div class="table-wrap"><table><thead><tr><th>Category</th><th>n</th><th>Share</th><th>Mean views</th><th>Median</th><th>Relative reach</th></tr></thead><tbody>{category_rows}</tbody></table></div>
     </section>
 
-    <section>
-      <h2>Voice of customer</h2>
-      <p class="sub">Official replies are excluded from demand counts.</p>
-      <div class="chips">{topic_chips}</div>
-      <p class="note"><b>Visible official response modes:</b> {html.escape(response_text)}. A redirect to DM/support is counted separately from a useful public answer.</p>
-    </section>
+{comment_section}
 
     <section>
       <h2>Evidence ledger</h2>
-      <p class="sub">The report keeps row IDs, dates, metrics, translations, and links together.</p>
-      <table><thead><tr><th>ID</th><th>Platform</th><th>Date</th><th>Translated text</th><th>Views</th><th>Evidence</th></tr></thead><tbody>{evidence_rows}</tbody></table>
+      <p class="sub">The report keeps row IDs, dates, visible metrics, working text, and links together.</p>
+      <div class="table-wrap"><table><thead><tr><th>ID</th><th>Platform</th><th>Date</th><th>Working text</th><th>Views</th><th>Likes</th><th>Comments</th><th>Evidence</th></tr></thead><tbody>{evidence_rows}</tbody></table></div>
     </section>
 
     <section>
       <h2>Scope and limitations</h2>
-      <p>This is a deliberately small, fictional dataset used to demonstrate the workflow. Real runs must state platform scope, cutoff time, visible-versus-captured totals, comment selection rules, unavailable records, authentication state, and known personalization effects. Public visibility does not authorize bypassing platform controls or unrestricted republication.</p>
+      <p>{scope_copy} Public visibility does not authorize bypassing platform controls or unrestricted republication.</p>
     </section>
   </main>
   <footer>Generated by Competitor Census · {html.escape(str(summary['generated_at']))}</footer>
@@ -314,6 +383,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--comments", type=Path, default=ROOT / "demo/input/comments.csv")
     parser.add_argument("--output", type=Path, default=ROOT / "demo/output/report.html")
     parser.add_argument("--json", dest="json_output", type=Path, default=ROOT / "demo/output/summary.json")
+    parser.add_argument("--dataset-label", default="Fictional Northstar Home Energy demo")
+    parser.add_argument("--dataset-kind", choices=("fictional", "live"), default="fictional")
     parser.add_argument("--quiet", action="store_true")
     return parser.parse_args()
 
@@ -322,8 +393,14 @@ def main() -> int:
     args = parse_args()
     census = load_csv(args.census, CENSUS_FIELDS)
     content = load_csv(args.content, CONTENT_FIELDS)
-    comments = load_csv(args.comments, COMMENT_FIELDS)
-    summary = analyze(census, content, comments)
+    comments = load_csv(args.comments, COMMENT_FIELDS, allow_empty=True)
+    summary = analyze(
+        census,
+        content,
+        comments,
+        dataset_label=args.dataset_label,
+        dataset_kind=args.dataset_kind,
+    )
 
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.json_output.parent.mkdir(parents=True, exist_ok=True)

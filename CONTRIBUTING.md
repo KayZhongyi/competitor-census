@@ -13,4 +13,6 @@ Before opening a pull request:
 5. Run `python3 -m unittest discover -s tests -v` and `python3 scripts/run_demo.py`.
 6. Explain the target platform/tool, tested environment, limitations, and evidence fields in the pull request.
 
+Live-adapter tests must use a fake local collector in CI. Do not commit real target output, cookies, session material, or downloaded media.
+
 Open an issue before a large architectural change so the scope can be agreed first.

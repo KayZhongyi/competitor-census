@@ -20,8 +20,9 @@
   <text x="92" y="354" fill="#9eb5c4" font-family="Inter,Arial,sans-serif" font-size="23">Turn public competitor channels into a traceable dataset and strategy report.</text>
   <g transform="translate(92 414)" font-family="Inter,Arial,sans-serif" font-size="17" font-weight="650">
     <rect width="184" height="48" rx="24" fill="none" stroke="#55758b"/><text x="28" y="31" fill="#eef5f8">AGENT SKILL</text>
-    <rect x="198" width="220" height="48" rx="24" fill="none" stroke="#55758b"/><text x="226" y="31" fill="#eef5f8">ZERO DEPENDENCIES</text>
-    <rect x="432" width="226" height="48" rx="24" fill="none" stroke="#55758b"/><text x="460" y="31" fill="#eef5f8">EVIDENCE-LINKED</text>
+    <rect x="198" width="182" height="48" rx="24" fill="none" stroke="#55758b"/><text x="226" y="31" fill="#eef5f8">LIVE YOUTUBE</text>
+    <rect x="394" width="180" height="48" rx="24" fill="none" stroke="#55758b"/><text x="422" y="31" fill="#eef5f8">OFFLINE DEMO</text>
+    <rect x="588" width="226" height="48" rx="24" fill="none" stroke="#55758b"/><text x="616" y="31" fill="#eef5f8">EVIDENCE-LINKED</text>
   </g>
   <g transform="translate(92 518)" font-family="Inter,Arial,sans-serif" font-size="17">
     <text fill="#e6ac51" font-weight="700">DISCOVER</text><path d="M104 0h65" stroke="#54758b"/>

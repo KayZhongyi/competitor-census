@@ -1,6 +1,6 @@
 ---
 name: competitor-census
-description: Build an evidence-backed competitor intelligence dataset and report from publicly visible web and social channels. Use when an agent must discover a competitor's real active platforms, capture in-scope public content without relying on a small sample, translate multilingual material, analyze content performance and customer questions, preserve source-level traceability, or repeat the same research workflow for another company or market.
+description: Build an evidence-backed competitor intelligence dataset and report from publicly visible web and social channels, including live YouTube channel metadata collection. Use when an agent must discover a competitor's real active platforms, capture in-scope public content without relying on a small sample, translate multilingual material, analyze content performance and customer questions, preserve source-level traceability, or repeat the same research workflow for another company or market.
 ---
 
 # Competitor Census
@@ -46,6 +46,8 @@ Collect all retrievable records inside the declared scope. Preserve source field
 - collection timestamp and retrieval status.
 
 Use incremental capture for virtualized or infinite-scroll pages. Deduplicate by stable ID or canonical URL, not by text alone. Normalize Unicode before matching disguised phone numbers or product codes. See [references/data-schema.md](references/data-schema.md).
+
+For a public YouTube channel, read [references/youtube-adapter.md](references/youtube-adapter.md) and use `scripts/collect_youtube.py`. Start with a limited run, verify account identity and output fields, then set `--max-items-per-tab 0` only when the user wants a best-effort selected-tab census. The adapter collects metadata without downloading media and leaves translation/classification for the analysis phase.
 
 ### 3. Deep-read high-value conversations
 
