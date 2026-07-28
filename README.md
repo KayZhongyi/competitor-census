@@ -9,68 +9,26 @@
   <a href="README.zh-CN.md">中文</a>
 </p>
 
-**Competitor Census** is an agent skill and open toolkit that turns public competitor channels into a structured evidence bundle and an evidence-linked strategy report. v0.3 adds a model-agnostic Agent analysis handoff with strict validation, while retaining the live YouTube adapter and zero-dependency offline demo.
+**Turn any competitor's public footprint into a traceable intelligence dossier.**
 
-It is built around one idea: **census first, conclusions second**. Discover the channels that matter, capture the in-scope public corpus, preserve dates and engagement metrics, translate multilingual content, analyze patterns, and keep every claim traceable to its source.
+Competitor Census is a reusable Agent Skill and open toolkit for global competitor research. Give it a company and market; it helps discover the channels that matter, build a structured evidence base, translate multilingual content, derive categories from the real corpus, quantify what performs, and generate a report whose claims lead back to source rows and URLs.
 
-> Public sources → platform census → in-scope capture → translation → evidence-backed analysis → report
+> Census first. Conclusions second.
 
-## Run it on a real YouTube channel
+## What it does
 
-Install the current [`yt-dlp`](https://github.com/yt-dlp/yt-dlp/wiki/Installation) release, then start with a small public-metadata run:
+| Capability | Result |
+|---|---|
+| **Platform census** | Find and verify the competitor's active public channels before choosing where to go deep |
+| **In-scope capture** | Preserve publication dates, text, views, likes, comments, shares, account fields, and source URLs |
+| **Multilingual normalization** | Keep original text beside a separate working translation in one consistent schema |
+| **Corpus-grounded classification** | Let an Agent read the complete corpus and derive categories from repeated meanings rather than preset keywords |
+| **Professional analysis** | Compare content supply with mean and median reach, count customer needs, study reply patterns, and map opportunities |
+| **Traceable delivery** | Produce CSV evidence, a declared taxonomy, validation results, and an evidence-linked HTML report |
 
-```bash
-git clone https://github.com/KayZhongyi/competitor-census.git
-cd competitor-census
-python3 -m pip install -U "yt-dlp[default]"
-python3 scripts/collect_youtube.py \
-  --company "OpenAI" \
-  --channel "https://www.youtube.com/@OpenAI" \
-  --tabs videos \
-  --max-items-per-tab 10
-```
+The same workflow can be reused across companies, languages, regions, and approved collection tools because the evidence schema and analysis layer stay independent from the source platform.
 
-Open `runs/openai/report.html`. The same run also writes normalized CSV evidence, a JSON summary, and a scope/limitations manifest. Replace the company and channel values with your target after the trial.
-
-<p align="center">
-  <img src="assets/youtube-live-demo.gif" alt="YouTube public metadata collection to evidence bundle and report" width="100%" />
-</p>
-
-For a best-effort census of every retrievable item in the selected public tabs:
-
-```bash
-python3 scripts/collect_youtube.py \
-  --company "Target Company" \
-  --channel "https://www.youtube.com/@TargetHandle" \
-  --tabs videos,shorts,streams \
-  --max-items-per-tab 0
-```
-
-The adapter opens public video metadata but never downloads the media. It captures stable ID, publication date, title and description, duration, views, likes, visible comment count, channel identity fields, availability, and source URL where available. Large histories take time; platform-visible fields can be blank.
-
-It deliberately leaves translation and content type unclassified. The Agent derives those fields from the real corpus instead of forcing preset keyword labels.
-
-## Close the analysis loop with any Agent
-
-Every YouTube run now creates `analysis/analysis_task.md` plus editable taxonomy and row-result templates. Ask Claude Code, Codex, or another file-capable Agent to follow that task, then validate and merge its work:
-
-```bash
-python3 scripts/apply_analysis.py --bundle runs/openai
-```
-
-The workflow is deliberately provider-neutral:
-
-```text
-immutable content.csv
-  → Agent reads the complete corpus
-  → taxonomy.json + analysis_results.csv
-  → deterministic validation
-  → analyzed_content.csv + evidence-linked report
-```
-
-The validator requires exactly one translation and declared category for every source ID. It checks the input fingerprint, rejects missing/duplicate/unknown IDs and malformed taxonomies, verifies representative evidence, and writes `analysis_report.html` only after the result passes. The raw `content.csv` is never overwritten. See [`references/analysis-handoff.md`](references/analysis-handoff.md) for the file contract.
-
-## See the offline demo in 60 seconds
+## See it in 60 seconds
 
 No API key, browser login, or package install is required:
 
@@ -86,38 +44,70 @@ Open `demo/output/report.html`, or view the [live fictional report](https://kayz
   <img src="assets/demo-preview.svg" alt="Fictional evidence-linked competitor report preview" width="100%" />
 </p>
 
-## Why this is different
+## Run a real public-channel census
 
-| Typical AI competitor research | Competitor Census |
-|---|---|
-| Starts with a familiar platform | Audits channels before choosing which ones to deep-dive |
-| Samples a few posts | Captures the best-effort in-scope public corpus at a stated cutoff |
-| Mixes source data and conclusions | Keeps an evidence bundle separate from the report |
-| Uses preset labels | Derives categories from the actual corpus |
-| Produces plausible prose | Attaches counts, denominators, row IDs, and source links |
-| Treats automation as unlimited | Pauses for human verification and respects platform controls |
+The included YouTube connector captures public video metadata without downloading media. Start with a small verification run:
 
-## What the workflow captures
+```bash
+python3 -m pip install -U "yt-dlp[default]"
+python3 scripts/collect_youtube.py \
+  --company "OpenAI" \
+  --channel "https://www.youtube.com/@OpenAI" \
+  --tabs videos \
+  --max-items-per-tab 10
+```
 
-For public content, the standard schema preserves:
+It writes the evidence bundle, baseline report, run manifest, and an Agent-ready analysis packet to `runs/openai/`.
 
-- platform, account, stable ID, publication date, original text, and source URL;
-- translation, media/content type, and visible brand/product references;
-- views/plays, likes, comments, shares, and platform-native interaction data;
-- public comments, commenter type when supportable, official replies, and response patterns;
-- collection cutoff, coverage, failures, and known limitations.
+<p align="center">
+  <img src="assets/youtube-live-demo.gif" alt="YouTube public metadata collection to evidence bundle and report" width="100%" />
+</p>
 
-The output is two deliverables—not one blended document:
+After checking the account and fields, run a best-effort census of all retrievable entries in the selected tabs:
 
-1. **Evidence bundle:** platform census, content, comments, and a run manifest.
-2. **Decision report:** executive brief, content mix, customer questions, performance gaps, response behavior, opportunities, and linked evidence.
+```bash
+python3 scripts/collect_youtube.py \
+  --company "Target Company" \
+  --channel "https://www.youtube.com/@TargetHandle" \
+  --tabs videos,shorts,streams \
+  --max-items-per-tab 0
+```
 
-## Install as an agent skill
+## Complete the analysis with any Agent
+
+Each collection run creates a model-agnostic task at `analysis/analysis_task.md`. Ask your preferred file-capable Agent to follow it, then validate the completed work:
+
+```text
+Use $competitor-census to follow runs/openai/analysis/analysis_task.md.
+Read the complete corpus, derive the taxonomy, and fill every analysis row.
+```
+
+```bash
+python3 scripts/apply_analysis.py --bundle runs/openai
+```
+
+```text
+content.csv (source evidence, unchanged)
+  → Agent reads the complete corpus
+  → taxonomy.json + analysis_results.csv
+  → deterministic validation
+  → analyzed_content.csv + analysis_report.html
+```
+
+The validator checks the source fingerprint, exact ID coverage, translation completeness, category definitions, confidence values, and representative evidence before producing the analyzed dataset and report.
+
+## Install as an Agent Skill
 
 ### Codex
 
 ```bash
 git clone https://github.com/KayZhongyi/competitor-census.git ~/.codex/skills/competitor-census
+```
+
+### Claude Code
+
+```bash
+git clone https://github.com/KayZhongyi/competitor-census.git ~/.claude/skills/competitor-census
 ```
 
 Then ask:
@@ -127,64 +117,44 @@ Use $competitor-census to research the public channels of [company] in [market].
 Build the evidence bundle first, then write a traceable strategy report.
 ```
 
-### Claude Code
+The Skill is plain Markdown plus Python standard-library tooling, so other terminal- and browser-capable Agents can use the same workflow.
 
-```bash
-git clone https://github.com/KayZhongyi/competitor-census.git ~/.claude/skills/competitor-census
-```
+## What you get
 
-The workflow is plain Markdown plus Python standard-library tooling, so it can also be read by other terminal- and browser-capable agents.
+| Artifact | Purpose |
+|---|---|
+| `platform_census.csv` | Audited accounts, identity evidence, activity, and deep-dive decisions |
+| `content.csv` | Source-level public content and point-in-time metrics |
+| `comments.csv` | Public conversation evidence and official-reply structure when collected |
+| `run_manifest.json` | Scope, cutoff, tools, coverage, and collection record |
+| `analysis/taxonomy.json` | Corpus-derived category definitions and representative row IDs |
+| `analysis/validation_report.json` | Machine-checkable completeness and integrity result |
+| `analyzed_content.csv` | Translation and classification merged without changing source evidence |
+| `analysis_report.html` | Management-ready findings with counts, denominators, evidence IDs, and source links |
 
-## Analysis methods included
+## Analysis built for decisions
 
-- **Emergent taxonomy:** categories come from repeated meanings in the corpus.
-- **Coverage–performance gap:** publishing share is compared with mean and median reach.
-- **Voice of customer:** concrete needs are counted with `n/N`, not summarized vaguely.
+- **Emergent taxonomy:** categories come from the corpus instead of a rigid template.
+- **Coverage–performance gap:** publishing share is compared with both mean and median reach.
+- **Voice of customer:** concrete needs are counted with visible denominators.
 - **Response-pattern analysis:** useful answers, templates, redirection, and silence are separated.
-- **Opportunity mapping:** high-demand/low-supply topics become testable opportunities.
-- **Evidence thresholds:** small or ambiguous samples are labeled instead of overclaimed.
+- **Opportunity mapping:** high-demand/low-supply themes become testable content and service opportunities.
+- **Evidence thresholds:** small or ambiguous samples remain labeled instead of becoming confident prose.
 
-The detailed method lives in [`references/analysis-playbook.md`](references/analysis-playbook.md).
+See [`references/analysis-playbook.md`](references/analysis-playbook.md) for the method and [`references/analysis-handoff.md`](references/analysis-handoff.md) for the Agent file contract.
 
-## Repository map
+## Designed for trustworthy reuse
 
-```text
-competitor-census/
-├── SKILL.md                         # Agent workflow and quality gates
-├── agents/openai.yaml               # Codex skill metadata
-├── demo/input/                      # Fictional, public-safe evidence bundle
-├── scripts/collect_youtube.py       # Live public YouTube metadata adapter
-├── scripts/prepare_analysis.py      # Fingerprinted, model-agnostic Agent handoff
-├── scripts/apply_analysis.py        # Validate, merge, and render analyzed output
-├── scripts/run_demo.py              # Generic evidence validator/report generator
-├── references/
-│   ├── analysis-playbook.md
-│   ├── analysis-handoff.md
-│   ├── collection-safety.md
-│   ├── data-schema.md
-│   └── youtube-adapter.md
-├── tests/
-└── docs/                             # GitHub Pages demo output
-```
+- Raw evidence stays separate from translation, classification, and conclusions.
+- Stable IDs and source links make every important number auditable.
+- Input fingerprints prevent an old analysis from being applied to a changed corpus.
+- Human review remains at account verification, platform challenges, and final business judgment.
+- Standard CSV/JSON contracts make new approved connectors and report formats easy to add.
 
-## Live collection stays adapter-based
+Responsible collection guidance lives in [`references/collection-safety.md`](references/collection-safety.md). The included demo is entirely fictional and public-safe.
 
-The YouTube adapter is the first working reference implementation. Other sources connect through an authorized browser, API, export, or organization-approved collector and write normalized output to the same CSV schema. This keeps the analysis/report layer portable across regions, languages, platforms, and AI agents.
-
-The project does **not** bypass CAPTCHA, authentication, rate limits, or platform safeguards. A “census” means a best-effort capture of the declared, publicly visible scope—not hidden, deleted, personalized, or restricted data.
-
-## Roadmap
-
-- [x] Live YouTube public-metadata adapter
-- [x] Model-agnostic translation/classification handoff with strict validation
-- [ ] Generic adapter interface and starter browser collectors
-- [ ] Incremental update and change-detection mode
-- [ ] Optional direct API providers for translation and classification
-- [ ] DOCX/PDF report themes
-- [ ] Cross-competitor comparison after individual dossiers are complete
-
-Contributions are welcome, especially public-safe adapters and report themes. See [CONTRIBUTING.md](CONTRIBUTING.md).
+Contributions are welcome, especially approved connectors, analysis methods, and report themes. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 
-[MIT](LICENSE). The demo company and every demo record are fictional. No employer, client, or real-user dataset is included.
+[MIT](LICENSE)
