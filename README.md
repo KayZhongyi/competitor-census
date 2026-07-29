@@ -26,6 +26,7 @@ Competitor Census is a reusable Agent Skill and open toolkit for global competit
 | **Professional analysis** | Compare content supply with mean and median reach, count customer needs, study reply patterns, and map opportunities |
 | **Customer voice mode** | Derive issue categories, classify intent/sentiment/severity, link visible official replies, and redact public usernames in shareable output |
 | **Traceable delivery** | Produce CSV evidence, a declared taxonomy, validation results, and an evidence-linked HTML report |
+| **Collaboration handoff** | Move reviewed evidence into a Bitable-style action index and send concise change briefs without exposing the raw corpus |
 
 The same workflow can be reused across companies, languages, regions, and approved collection tools because the evidence schema and analysis layer stay independent from the source platform.
 
@@ -138,6 +139,12 @@ comments.csv + content.csv (source evidence, unchanged)
 
 The mode separates **issue**, **intent**, **sentiment**, and **severity** instead of reducing customer feedback to a positive/negative score. High-severity records require visible justification, and the shareable report replaces public usernames with stable aliases.
 
+## Bring reviewed evidence into the workstream
+
+The report is a decision surface, not the end of the workflow. Keep the raw evidence bundle access-controlled, then create a reviewed index with source links, evidence IDs, findings, owners, and status. A Feishu Bitable can serve as that index; a group card can carry only the new signal, decision, and action needed for the team to respond.
+
+This repository documents the handoff contract rather than shipping a credentialed SaaS integration. A live Feishu sync requires an approved app, minimum scopes, a controlled destination, and secret management. Read [`references/collaboration-handoff.md`](references/collaboration-handoff.md) before implementing it.
+
 ## Install as an Agent Skill
 
 ### Codex
@@ -199,6 +206,7 @@ See [`references/analysis-playbook.md`](references/analysis-playbook.md) for com
 - Human review remains at account verification, platform challenges, and final business judgment.
 - Standard CSV/JSON contracts make new approved connectors and report formats easy to add.
 - Date-bounded capture and stable-ID merging support repeat monitoring without overwriting earlier evidence.
+- Collaboration handoff preserves an evidence ID and source link instead of turning a group summary into an untraceable conclusion.
 
 Responsible collection guidance lives in [`references/collection-safety.md`](references/collection-safety.md). The included demo is entirely fictional and public-safe.
 

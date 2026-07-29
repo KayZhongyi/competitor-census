@@ -152,6 +152,12 @@ For `customer_voice`, also deliver:
 - `customer_voice_summary.json`;
 - `customer_voice_report.html`.
 
+### 6a. Hand off reviewed findings for collaboration
+
+Read [references/collaboration-handoff.md](references/collaboration-handoff.md) when business users need the evidence to become shared work rather than a static report. Keep the complete raw bundle in access-controlled storage. Share only a reviewed, minimal evidence view with action fields such as owner and status.
+
+For Feishu, use a Bitable as the evidence index and a group card for concise changes, decisions, and review requests. Do not claim a live Feishu synchronization unless an approved self-built app, scopes, destination, and secret management have been configured. Never place a webhook, access token, raw personal data, or full unreviewed corpus in a repository or group chat.
+
 ### 7. Quality gate
 
 Before delivery, verify:
