@@ -24,6 +24,8 @@ python3 scripts/merge_incremental.py \
   --output runs/target-current/content.csv
 ```
 
-For comments, add `--id-field comment_id`. The tool requires identical CSV schemas, ignores `collected_at` only when detecting changes, keeps the incoming row for a known ID, retains base rows absent from the incoming scope, and writes a JSON report containing new, updated, unchanged, and absent counts.
+For comments, add `--id-field comment_id`. The tool requires identical CSV schemas, ignores `collected_at` only when detecting changes, keeps the incoming row for a known ID, retains base rows absent from the incoming scope, and writes a JSON report containing new, updated, unchanged, and absent counts. Each updated record also lists the changed fields and whether the difference is `content`, `engagement`, or `metadata`, so a notification layer can suppress harmless metric drift and route material changes for review.
 
 Absence from a bounded incoming run is not proof of deletion. Verify the source separately before marking a record removed or unavailable.
+
+Read [monitoring-playbook.md](monitoring-playbook.md) before turning a repeat run into an alert or group notification.

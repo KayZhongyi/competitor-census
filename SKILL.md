@@ -60,6 +60,8 @@ For a public YouTube channel, read [references/youtube-adapter.md](references/yo
 
 For repeat monitoring, read [references/incremental-updates.md](references/incremental-updates.md). Use a new run directory, apply an explicit date boundary when supported, and merge by stable ID with `scripts/merge_incremental.py`. Treat records absent from a bounded update as “not returned in this run,” not deleted.
 
+When the purpose is alerting rather than a full refresh, also read [references/monitoring-playbook.md](references/monitoring-playbook.md). Use the merge report's changed-field record, human review thresholds, and a concise evidence-linked brief; do not alert merely because an engagement counter drifted.
+
 ### 3. Deep-read high-value conversations
 
 Rank content using reach, comment volume, recency, and strategic relevance, then capture publicly visible comments and official replies from the chosen set. If useful comments are sparse, widen the content set and say so explicitly; never inflate a thin sample.
@@ -170,6 +172,8 @@ Before delivery, verify:
 - arithmetic and denominators behind every claim;
 - raw-data/report separation;
 - removal of secrets, private data, and unsupported certainty.
+
+For evidence-grounded market personas, read [references/persona-research.md](references/persona-research.md). This is a reusable extension playbook, not a claim that a generic “average customer” persona has been validated.
 
 ## Offline demo
 

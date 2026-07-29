@@ -42,6 +42,13 @@ Read [customer-voice-playbook.md](customer-voice-playbook.md) before completing 
 
 Channel intelligence, market-entry research, and brand-risk monitoring can reuse the same evidence contract, but do not claim them as implemented modes until their discovery rules, analysis fields, validation, tests, and public-safe example have been completed.
 
+Two reusable extension playbooks are available:
+
+- [monitoring-playbook.md](monitoring-playbook.md) defines a material-change alert contract on top of stable-ID incremental merge;
+- [persona-research.md](persona-research.md) defines evidence-grounded EPC, installer, channel, or end-customer roles without inventing an “average” persona.
+
+They require their own declared source population, review rules, and output checks before being described as deployed business modes.
+
 ## Collaboration handoff
 
 Competitor intelligence and customer voice are the implemented analysis modes. Their reviewed outputs may be handed off to a collaboration layer for decision tracking, but that handoff does not create a new validated research mode. See [collaboration-handoff.md](collaboration-handoff.md).

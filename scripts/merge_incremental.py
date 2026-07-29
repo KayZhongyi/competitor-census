@@ -38,6 +38,27 @@ def comparable(row: dict[str, str], fields: list[str], ignored: set[str]) -> tup
     return tuple(row.get(field, "") for field in fields if field not in ignored)
 
 
+def changed_fields(
+    previous: dict[str, str], incoming: dict[str, str], fields: list[str], ignored: set[str]
+) -> list[str]:
+    return [
+        field
+        for field in fields
+        if field not in ignored and previous.get(field, "") != incoming.get(field, "")
+    ]
+
+
+def change_kinds(fields: list[str]) -> list[str]:
+    kinds: list[str] = []
+    if any(field in {"text_original", "text_translation", "content_type", "topic"} for field in fields):
+        kinds.append("content")
+    if any(field in {"views", "likes", "comments_count", "shares"} for field in fields):
+        kinds.append("engagement")
+    if any(field not in {"text_original", "text_translation", "content_type", "topic", "views", "likes", "comments_count", "shares"} for field in fields):
+        kinds.append("metadata")
+    return kinds or ["unknown"]
+
+
 def merge(
     base_path: Path,
     incoming_path: Path,
@@ -59,16 +80,23 @@ def merge(
     new_ids: list[str] = []
     updated_ids: list[str] = []
     unchanged_ids: list[str] = []
+    updated_records: list[dict[str, object]] = []
     merged_by_id = dict(base_by_id)
 
     for record_id, incoming in incoming_by_id.items():
         previous = base_by_id.get(record_id)
         if previous is None:
             new_ids.append(record_id)
-        elif comparable(previous, base_fields, ignored_fields) != comparable(
-            incoming, base_fields, ignored_fields
-        ):
+        elif comparable(previous, base_fields, ignored_fields) != comparable(incoming, base_fields, ignored_fields):
             updated_ids.append(record_id)
+            fields = changed_fields(previous, incoming, base_fields, ignored_fields)
+            updated_records.append(
+                {
+                    "id": record_id,
+                    "changed_fields": fields,
+                    "change_kinds": change_kinds(fields),
+                }
+            )
         else:
             unchanged_ids.append(record_id)
         merged_by_id[record_id] = incoming
@@ -85,7 +113,7 @@ def merge(
     )
     absent_ids = [record_id for record_id in base_by_id if record_id not in incoming_by_id]
     report = {
-        "schema_version": "0.4",
+        "schema_version": "0.5",
         "merged_at": utc_now(),
         "id_field": id_field,
         "ignored_for_change_detection": sorted(ignored_fields),
@@ -98,6 +126,7 @@ def merge(
         "absent_from_incoming": len(absent_ids),
         "new_ids": new_ids,
         "updated_ids": updated_ids,
+        "updated_records": updated_records,
         "absent_from_incoming_ids": absent_ids,
         "note": (
             "Absent records are retained. Absence may reflect the incoming scope and is not treated "

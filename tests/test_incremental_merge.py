@@ -69,6 +69,10 @@ class IncrementalMergeTest(unittest.TestCase):
             self.assertEqual(report["updated"], 1)
             self.assertEqual(report["unchanged"], 1)
             self.assertEqual(report["absent_from_incoming"], 1)
+            self.assertEqual(
+                report["updated_records"],
+                [{"id": "B", "changed_fields": ["views"], "change_kinds": ["engagement"]}],
+            )
 
     def test_refuses_to_overwrite_source(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

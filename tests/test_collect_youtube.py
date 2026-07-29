@@ -92,6 +92,8 @@ print(json.dumps(record))
                     str(fake_ytdlp),
                     "--output",
                     str(output),
+                    "--sleep-requests",
+                    "1.25",
                 ],
                 check=True,
                 capture_output=True,
@@ -110,6 +112,9 @@ print(json.dumps(record))
             self.assertEqual(manifest["collector"]["version"], "2099.01.01-test")
             self.assertEqual(manifest["since"], "2026-01-01")
             self.assertEqual(manifest["counts"]["unique_content"], 2)
+            self.assertEqual(manifest["collection_controls"]["request_delay_seconds"], 1.25)
+            self.assertEqual(manifest["collection_controls"]["retry_limit"], 3)
+            self.assertEqual(manifest["collection_controls"]["captcha_policy"], "stop and require a human; never bypass")
             self.assertIn("Comments not included", report)
             self.assertIn("content classification are intentionally pending", report)
             self.assertTrue((output / "analysis/analysis_task.md").exists())

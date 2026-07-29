@@ -30,6 +30,16 @@ Competitor Census is a reusable Agent Skill and open toolkit for global competit
 
 The same workflow can be reused across companies, languages, regions, and approved collection tools because the evidence schema and analysis layer stay independent from the source platform.
 
+## One evidence base, three decision modes
+
+| Start with | Then use it to answer | Output |
+|---|---|---|
+| **Baseline census** | Which public channels matter, what is published, and what performs? | Traceable competitor report |
+| **Incremental monitoring** | What materially changed since the last reviewed snapshot? | Evidence-linked change brief, not noisy counter updates |
+| **Evidence-grounded personas** | What can public signals support about installers, partners, or end users? | Explicitly bounded personas with source IDs, counter-evidence, and confidence |
+
+This is not another “scrape and summarize” tool. Collection is a versioned evidence layer; translation, analysis, reports, monitoring, and approved collaboration handoffs are separate layers that can be rerun without overwriting the original capture. Read [`references/monitoring-playbook.md`](references/monitoring-playbook.md) for monitoring and [`references/persona-research.md`](references/persona-research.md) for persona research.
+
 ## See it in 60 seconds
 
 No API key, browser login, or package install is required:
@@ -90,7 +100,7 @@ python3 scripts/merge_incremental.py \
   --output runs/target-current/content.csv
 ```
 
-The merge report separates new, updated, unchanged, and absent-from-this-run records without treating absence as deletion.
+The merge report separates new, updated, unchanged, and absent-from-this-run records without treating absence as deletion. It also records the fields that changed, so a monitoring brief can prioritize a real content or operational change rather than routine engagement-counter drift.
 
 ## Complete the analysis with any Agent
 

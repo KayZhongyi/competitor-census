@@ -343,6 +343,7 @@ def write_bundle(
     records_by_tab: dict[str, list[dict[str, object]]],
     warnings_by_tab: dict[str, str],
     version: str,
+    request_delay_seconds: float,
 ) -> tuple[int, Path]:
     collected_at = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
     records = merge_records(records_by_tab)
@@ -378,6 +379,13 @@ def write_bundle(
         "cutoff_utc": collected_at,
         "collector": {"name": "yt-dlp", "version": version},
         "source_access": "public unauthenticated metadata; no media downloaded",
+        "collection_controls": {
+            "request_delay_seconds": request_delay_seconds,
+            "retry_limit": 3,
+            "authentication": "not used by this adapter",
+            "captcha_policy": "stop and require a human; never bypass",
+            "media_download": "disabled",
+        },
         "scope": (
             ("Limited test run" if max_items > 0 else "Best-effort all retrievable entries in selected tabs")
             + (f" published on or after {since}" if since else "")
@@ -537,6 +545,7 @@ def main() -> int:
         records_by_tab=records_by_tab,
         warnings_by_tab=warnings_by_tab,
         version=version,
+        request_delay_seconds=args.sleep_requests,
     )
     if not args.no_report:
         build_report(output_dir, args.company)
