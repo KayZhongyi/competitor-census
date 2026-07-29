@@ -6,7 +6,7 @@
 
 **把任意友商分散在公开渠道中的信息，变成一份可追溯、可复用的竞品情报档案。**
 
-Competitor Census 是面向全球市场的 Agent Skill 与开源工具包。输入公司和市场，它可以帮助你找到真正活跃的公开渠道，建立结构化证据库，处理多语言内容，从完整语料中形成分类，量化内容表现与客户诉求，并生成每条关键结论都能回到数据行和原始链接的报告。
+Competitor Census 是面向全球市场的 Agent Skill 与开源工具包。输入公司和市场，它可以帮助你找到真正活跃的公开渠道，建立结构化证据库，处理多语言内容，从完整语料中形成分类，量化内容表现与客户诉求，并生成每条关键结论都能回到数据行和原始链接的报告。当证据库包含公开对话时，还可以运行经过校验的客户声音分析模式。
 
 > 先普查，后深挖；先证据，后结论。
 
@@ -19,6 +19,7 @@ Competitor Census 是面向全球市场的 Agent Skill 与开源工具包。输�
 | **多语言处理** | 原文与工作译文分开保存，不同语言进入同一套结构化数据 |
 | **自下而上归类** | Agent 通读完整语料后再形成类别，不用预设关键词硬套标签 |
 | **专业分析** | 对比内容供给与平均/中位传播效果，统计客户诉求、回复方式和机会缺口 |
+| **客户声音模式** | 自下而上形成问题分类，区分意图、情绪与严重程度，关联可见官方回复，并对分享版用户名脱敏 |
 | **可追溯交付** | 输出 CSV 证据库、分类体系、校验结果和带证据链接的 HTML 报告 |
 
 证据结构与分析层不绑定具体平台，因此同一流程可以跨公司、跨语言、跨地区，并接入经过批准的采集工具。
@@ -68,6 +69,23 @@ python3 scripts/collect_youtube.py \
   --max-items-per-tab 0
 ```
 
+需要持续监测时，将指定日期之后的新一轮采集写入独立目录，再按稳定ID合并：
+
+```bash
+python3 scripts/collect_youtube.py \
+  --company "目标公司" \
+  --channel "https://www.youtube.com/@TargetHandle" \
+  --since 2026-07-01 \
+  --output runs/target-2026-07
+
+python3 scripts/merge_incremental.py \
+  --base runs/target-baseline/content.csv \
+  --incoming runs/target-2026-07/content.csv \
+  --output runs/target-current/content.csv
+```
+
+合并报告会分别统计新增、更新、未变化和本轮未出现的记录，不会把“本轮未出现”直接判定为删除。
+
 ## 用任意 Agent 完成分析
 
 每次采集都会生成模型无关的 `analysis/analysis_task.md`。让你常用的文件型 Agent 按任务完成分析，再运行校验：
@@ -90,6 +108,30 @@ content.csv（原始证据，不改写）
 ```
 
 校验器会检查源文件指纹、ID 完整性、译文覆盖率、分类定义、置信度和代表性证据，全部通过后才生成分析数据和报告。
+
+## 运行客户声音分析
+
+当证据库的 `comments.csv` 中已经包含合规采集的公开对话时，可创建独立的客户声音任务：
+
+```bash
+python3 scripts/prepare_customer_voice.py --bundle runs/target-company
+```
+
+让任意文件型 Agent 执行 `voice/voice_task.md`，再运行：
+
+```bash
+python3 scripts/apply_customer_voice.py --bundle runs/target-company
+```
+
+```text
+comments.csv + content.csv（原始证据，不改写）
+  → Agent 通读完整客户语料
+  → voice_taxonomy.json + voice_results.csv
+  → 确定性校验 + 可见官方回复关联
+  → analyzed_voice.csv + customer_voice_report.html
+```
+
+该模式将**问题、意图、情绪、严重程度和置信度**分别处理，而不是把客户反馈简化为正负面情感分数。高风险记录必须提供可观察依据，分享版报告会将公开用户名替换为稳定匿名ID。
 
 ## 安装为 Agent Skill
 
@@ -126,25 +168,32 @@ Skill 由 Markdown 流程和 Python 标准库脚本组成，其他具备终端�
 | `analysis/validation_report.json` | 可机器检查的完整性与一致性结果 |
 | `analyzed_content.csv` | 在不改写原始证据的前提下合并译文与分类 |
 | `analysis_report.html` | 带数量、分母、证据 ID 和原始链接的管理层报告 |
+| `voice/voice_taxonomy.json` | 从客户语料中形成的问题定义和代表性评论 ID |
+| `voice/validation_report.json` | 客户声音分析的完整性、一致性和标签校验 |
+| `analyzed_voice.csv` | 含匿名作者ID和可见回复关系的客户声音分析数据 |
+| `customer_voice_report.html` | 问题、意图、情绪、严重程度、回应和证据一体化报告 |
 
 ## 面向业务决策的分析方法
 
 - **自下而上分类：** 类别来自真实语料，而不是固定模板。
 - **供给—效果错位：** 同时比较发布占比、平均播放量和中位播放量。
 - **客户声音分析：** 对具体问题和诉求做带分母的频次统计。
+- **客户信号分诊：** 将问题、意图、情绪、严重程度和置信度分开处理。
 - **回复模式分析：** 区分有效回答、模板回复、渠道引导和未公开回复。
 - **机会映射：** 把高需求、低供给主题转化为可验证的内容与服务机会。
 - **证据阈值：** 小样本和歧义记录保留标记，不包装成确定结论。
 
-分析方法见 [`references/analysis-playbook.md`](references/analysis-playbook.md)，Agent 文件规范见 [`references/analysis-handoff.md`](references/analysis-handoff.md)。
+友商分析方法见 [`references/analysis-playbook.md`](references/analysis-playbook.md)，客户声音方法见 [`references/customer-voice-playbook.md`](references/customer-voice-playbook.md)，场景选择见 [`references/research-modes.md`](references/research-modes.md)。
 
 ## 为可信复用而设计
 
 - 原始证据与翻译、分类、结论始终分离。
 - 稳定 ID 和原始链接让每个关键数字都可复核。
 - 输入指纹防止旧分析误套到已经变化的新语料。
+- 客户声音分享版输出默认将公开用户名替换为稳定匿名ID。
 - 账号核验、平台验证和最终业务判断保留人工确认。
 - 标准 CSV/JSON 接口便于继续增加合规连接器和报告格式。
+- 按日期采集与稳定ID合并支持持续监测，同时保留历次原始证据。
 
 公开信息采集规范见 [`references/collection-safety.md`](references/collection-safety.md)。仓库中的演示公司与数据全部为虚构内容。
 

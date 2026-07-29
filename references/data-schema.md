@@ -48,6 +48,8 @@ The v0.3 analysis handoff keeps this file unchanged. Agent output is validated s
 
 Keep the header even when an adapter does not collect comments. An empty table means “not collected,” not “the content received zero comments.”
 
+Collectors should leave translation, topic, commenter type, and response mode blank unless those values are deterministic source facts or come from a separately validated analysis. The fictional demo contains completed values only to demonstrate reporting.
+
 | Field | Meaning |
 |---|---|
 | `comment_id` | Stable comment ID |
@@ -65,4 +67,25 @@ Keep the header even when an adapter does not collect comments. An empty table m
 
 ## `run_manifest.json`
 
-Record target, market, cutoff, timezone, platforms checked, included scope, comment selection rule, tool versions, row counts, validation results, failures, and known limitations.
+Record `research_mode`, target, market, date range, cutoff, timezone, platforms/accounts/queries checked, included scope, comment selection rule, tool versions, row counts, validation results, failures, and known limitations.
+
+## Customer voice analysis outputs
+
+`prepare_customer_voice.py` fingerprints `comments.csv` and contextual `content.csv`, then creates a separate `voice/` packet. `apply_customer_voice.py` validates the completed packet and never edits either source file.
+
+### `voice/voice_results.csv`
+
+| Field | Meaning |
+|---|---|
+| `comment_id` | Exactly one non-official source ID |
+| `text_translation` | Faithful working translation |
+| `issue_type` | Corpus-derived ID declared in `voice_taxonomy.json` |
+| `signal_type` | question / complaint / request / praise / experience / other |
+| `sentiment` | positive / neutral / negative / mixed / unclear |
+| `severity` | informational / low / medium / high / critical |
+| `analysis_confidence` | high / medium / low |
+| `analysis_notes` | Ambiguity or observable severity justification |
+
+### `analyzed_voice.csv`
+
+Contains customer signals only, with validated analysis fields and visible official-reply links. It replaces `commenter` with a stable `commenter_alias`; the raw identifier remains only in the local evidence bundle.

@@ -114,6 +114,16 @@ def parse_tabs(value: str) -> list[str]:
     return list(dict.fromkeys(requested)) or list(ALLOWED_TABS)
 
 
+def parse_since(value: str | None) -> str | None:
+    if not value:
+        return None
+    try:
+        parsed = datetime.strptime(value.strip(), "%Y-%m-%d")
+    except ValueError as exc:
+        raise ValueError("--since must use YYYY-MM-DD") from exc
+    return parsed.strftime("%Y%m%d")
+
+
 def resolve_ytdlp(explicit_path: str | None) -> list[str]:
     if explicit_path:
         path = Path(explicit_path).expanduser()
@@ -152,6 +162,7 @@ def collect_tab(
     tab_url: str,
     max_items: int,
     sleep_requests: float,
+    date_after: str | None,
 ) -> tuple[list[dict[str, object]], str]:
     args = [
         *command,
@@ -168,6 +179,8 @@ def collect_tab(
     ]
     if max_items > 0:
         args.extend(["--playlist-end", str(max_items)])
+    if date_after:
+        args.extend(["--dateafter", date_after])
     args.append(tab_url)
 
     result = subprocess.run(
@@ -326,6 +339,7 @@ def write_bundle(
     channel_base: str,
     selected_tabs: list[str],
     max_items: int,
+    since: str | None,
     records_by_tab: dict[str, list[dict[str, object]]],
     warnings_by_tab: dict[str, str],
     version: str,
@@ -360,11 +374,13 @@ def write_bundle(
         "normalized_channel_url": channel_base,
         "selected_tabs": selected_tabs,
         "max_items_per_tab": max_items,
+        "since": since,
         "cutoff_utc": collected_at,
         "collector": {"name": "yt-dlp", "version": version},
         "source_access": "public unauthenticated metadata; no media downloaded",
         "scope": (
-            "Limited test run" if max_items > 0 else "Best-effort all retrievable entries in selected tabs"
+            ("Limited test run" if max_items > 0 else "Best-effort all retrievable entries in selected tabs")
+            + (f" published on or after {since}" if since else "")
         ),
         "counts": {
             "unique_content": len(rows),
@@ -449,6 +465,10 @@ def parse_args() -> argparse.Namespace:
         help="Limit each selected tab for a trial run; 0 means all retrievable items",
     )
     parser.add_argument(
+        "--since",
+        help="Only request records published on or after YYYY-MM-DD",
+    )
+    parser.add_argument(
         "--output",
         type=Path,
         help="Output directory (default: runs/<company-slug>)",
@@ -479,6 +499,7 @@ def main() -> int:
     try:
         channel_base = normalize_channel_base(args.channel)
         selected_tabs = parse_tabs(args.tabs)
+        date_after = parse_since(args.since)
         command = resolve_ytdlp(args.ytdlp_path)
     except (ValueError, FileNotFoundError) as exc:
         raise SystemExit(str(exc)) from exc
@@ -499,6 +520,7 @@ def main() -> int:
             tab_url,
             args.max_items_per_tab,
             args.sleep_requests,
+            date_after,
         )
         records_by_tab[tab] = records
         warnings_by_tab[tab] = warning
@@ -511,6 +533,7 @@ def main() -> int:
         channel_base=channel_base,
         selected_tabs=selected_tabs,
         max_items=args.max_items_per_tab,
+        since=args.since,
         records_by_tab=records_by_tab,
         warnings_by_tab=warnings_by_tab,
         version=version,

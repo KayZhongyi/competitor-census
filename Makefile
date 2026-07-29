@@ -1,4 +1,4 @@
-.PHONY: demo test validate youtube-help analysis-help
+.PHONY: demo test validate youtube-help analysis-help voice-help incremental-help
 
 demo:
 	python3 scripts/run_demo.py
@@ -15,3 +15,10 @@ youtube-help:
 analysis-help:
 	python3 scripts/prepare_analysis.py --help
 	python3 scripts/apply_analysis.py --help
+
+voice-help:
+	python3 scripts/prepare_customer_voice.py --help
+	python3 scripts/apply_customer_voice.py --help
+
+incremental-help:
+	python3 scripts/merge_incremental.py --help

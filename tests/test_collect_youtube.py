@@ -29,6 +29,9 @@ class YouTubeCollectorTest(unittest.TestCase):
             collect_youtube.normalize_channel_base("https://www.youtube.com/watch?v=abc")
         with self.assertRaises(ValueError):
             collect_youtube.normalize_channel_base("https://www.youtube.com/@Example/featured")
+        self.assertEqual(collect_youtube.parse_since("2026-01-02"), "20260102")
+        with self.assertRaises(ValueError):
+            collect_youtube.parse_since("02/01/2026")
 
     def test_live_cli_writes_a_deduplicated_bundle_and_report(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -83,6 +86,8 @@ print(json.dumps(record))
                     "videos,shorts",
                     "--max-items-per-tab",
                     "1",
+                    "--since",
+                    "2026-01-01",
                     "--yt-dlp",
                     str(fake_ytdlp),
                     "--output",
@@ -103,6 +108,7 @@ print(json.dumps(record))
             self.assertEqual(rows[0]["content_type"], "unclassified")
             self.assertEqual(rows[0]["text_translation"], "")
             self.assertEqual(manifest["collector"]["version"], "2099.01.01-test")
+            self.assertEqual(manifest["since"], "2026-01-01")
             self.assertEqual(manifest["counts"]["unique_content"], 2)
             self.assertIn("Comments not included", report)
             self.assertIn("content classification are intentionally pending", report)

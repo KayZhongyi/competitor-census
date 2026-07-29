@@ -11,7 +11,7 @@
 
 **Turn any competitor's public footprint into a traceable intelligence dossier.**
 
-Competitor Census is a reusable Agent Skill and open toolkit for global competitor research. Give it a company and market; it helps discover the channels that matter, build a structured evidence base, translate multilingual content, derive categories from the real corpus, quantify what performs, and generate a report whose claims lead back to source rows and URLs.
+Competitor Census is a reusable Agent Skill and open toolkit for global competitor research. Give it a company and market; it helps discover the channels that matter, build a structured evidence base, translate multilingual content, derive categories from the real corpus, quantify what performs, and generate a report whose claims lead back to source rows and URLs. The same evidence bundle can run a validated customer-voice analysis when public conversations are available.
 
 > Census first. Conclusions second.
 
@@ -24,6 +24,7 @@ Competitor Census is a reusable Agent Skill and open toolkit for global competit
 | **Multilingual normalization** | Keep original text beside a separate working translation in one consistent schema |
 | **Corpus-grounded classification** | Let an Agent read the complete corpus and derive categories from repeated meanings rather than preset keywords |
 | **Professional analysis** | Compare content supply with mean and median reach, count customer needs, study reply patterns, and map opportunities |
+| **Customer voice mode** | Derive issue categories, classify intent/sentiment/severity, link visible official replies, and redact public usernames in shareable output |
 | **Traceable delivery** | Produce CSV evidence, a declared taxonomy, validation results, and an evidence-linked HTML report |
 
 The same workflow can be reused across companies, languages, regions, and approved collection tools because the evidence schema and analysis layer stay independent from the source platform.
@@ -73,6 +74,23 @@ python3 scripts/collect_youtube.py \
   --max-items-per-tab 0
 ```
 
+For repeat monitoring, collect a date-bounded update into a new directory and merge by stable ID:
+
+```bash
+python3 scripts/collect_youtube.py \
+  --company "Target Company" \
+  --channel "https://www.youtube.com/@TargetHandle" \
+  --since 2026-07-01 \
+  --output runs/target-2026-07
+
+python3 scripts/merge_incremental.py \
+  --base runs/target-baseline/content.csv \
+  --incoming runs/target-2026-07/content.csv \
+  --output runs/target-current/content.csv
+```
+
+The merge report separates new, updated, unchanged, and absent-from-this-run records without treating absence as deletion.
+
 ## Complete the analysis with any Agent
 
 Each collection run creates a model-agnostic task at `analysis/analysis_task.md`. Ask your preferred file-capable Agent to follow it, then validate the completed work:
@@ -95,6 +113,30 @@ content.csv (source evidence, unchanged)
 ```
 
 The validator checks the source fingerprint, exact ID coverage, translation completeness, category definitions, confidence values, and representative evidence before producing the analyzed dataset and report.
+
+## Run customer voice analysis
+
+When an evidence bundle contains public conversations in `comments.csv`, create an independent customer-voice task:
+
+```bash
+python3 scripts/prepare_customer_voice.py --bundle runs/target-company
+```
+
+Ask any file-capable Agent to follow `voice/voice_task.md`, then validate and render:
+
+```bash
+python3 scripts/apply_customer_voice.py --bundle runs/target-company
+```
+
+```text
+comments.csv + content.csv (source evidence, unchanged)
+  → Agent reads the complete customer corpus
+  → voice_taxonomy.json + voice_results.csv
+  → deterministic validation + official-reply linking
+  → analyzed_voice.csv + customer_voice_report.html
+```
+
+The mode separates **issue**, **intent**, **sentiment**, and **severity** instead of reducing customer feedback to a positive/negative score. High-severity records require visible justification, and the shareable report replaces public usernames with stable aliases.
 
 ## Install as an Agent Skill
 
@@ -131,25 +173,32 @@ The Skill is plain Markdown plus Python standard-library tooling, so other termi
 | `analysis/validation_report.json` | Machine-checkable completeness and integrity result |
 | `analyzed_content.csv` | Translation and classification merged without changing source evidence |
 | `analysis_report.html` | Management-ready findings with counts, denominators, evidence IDs, and source links |
+| `voice/voice_taxonomy.json` | Corpus-derived customer-issue definitions and representative comment IDs |
+| `voice/validation_report.json` | Completeness, integrity, and labeling checks for customer voice |
+| `analyzed_voice.csv` | Validated customer signals with redacted author aliases and visible-response linkage |
+| `customer_voice_report.html` | Issue, intent, sentiment, severity, response, and evidence-led customer voice report |
 
 ## Analysis built for decisions
 
 - **Emergent taxonomy:** categories come from the corpus instead of a rigid template.
 - **Coverage–performance gap:** publishing share is compared with both mean and median reach.
 - **Voice of customer:** concrete needs are counted with visible denominators.
+- **Customer signal triage:** issue, intent, sentiment, severity, and confidence remain separate.
 - **Response-pattern analysis:** useful answers, templates, redirection, and silence are separated.
 - **Opportunity mapping:** high-demand/low-supply themes become testable content and service opportunities.
 - **Evidence thresholds:** small or ambiguous samples remain labeled instead of becoming confident prose.
 
-See [`references/analysis-playbook.md`](references/analysis-playbook.md) for the method and [`references/analysis-handoff.md`](references/analysis-handoff.md) for the Agent file contract.
+See [`references/analysis-playbook.md`](references/analysis-playbook.md) for competitor analysis, [`references/customer-voice-playbook.md`](references/customer-voice-playbook.md) for customer voice, and [`references/research-modes.md`](references/research-modes.md) for mode selection.
 
 ## Designed for trustworthy reuse
 
 - Raw evidence stays separate from translation, classification, and conclusions.
 - Stable IDs and source links make every important number auditable.
 - Input fingerprints prevent an old analysis from being applied to a changed corpus.
+- Shareable customer-voice outputs replace public usernames with stable aliases.
 - Human review remains at account verification, platform challenges, and final business judgment.
 - Standard CSV/JSON contracts make new approved connectors and report formats easy to add.
+- Date-bounded capture and stable-ID merging support repeat monitoring without overwriting earlier evidence.
 
 Responsible collection guidance lives in [`references/collection-safety.md`](references/collection-safety.md). The included demo is entirely fictional and public-safe.
 

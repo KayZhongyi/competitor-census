@@ -1,11 +1,11 @@
 ---
 name: competitor-census
-description: Build an evidence-backed competitor intelligence dataset and report from publicly visible web and social channels, including live YouTube metadata collection and a validated model-agnostic analysis handoff. Use when an agent must discover a competitor's real active platforms, capture in-scope public content without relying on a small sample, translate multilingual material, derive a corpus-grounded taxonomy, analyze content performance and customer questions, preserve source-level traceability, or repeat the same research workflow for another company or market.
+description: Build evidence-backed competitor intelligence or customer-voice datasets and reports from publicly visible web and social channels, including live YouTube metadata collection and validated model-agnostic analysis handoffs. Use when an agent must discover a competitor's active platforms, capture an in-scope public corpus, translate multilingual material, derive corpus-grounded content or issue taxonomies, analyze content performance, customer questions, sentiment, severity, and visible response patterns, preserve source-level traceability, or repeat the workflow for another company or market.
 ---
 
 # Competitor Census
 
-Turn scattered public competitor signals into two separate deliverables: a machine-readable evidence bundle and a decision-ready report. Treat a census as a best-effort capture of all in-scope, publicly visible records at a stated cutoff—not as a guarantee about hidden, deleted, personalized, or access-restricted content.
+Turn scattered public signals into two separate deliverables: a machine-readable evidence bundle and a decision-ready report. Treat a census as a best-effort capture of all in-scope, publicly visible records at a stated cutoff—not as a guarantee about hidden, deleted, personalized, or access-restricted content.
 
 ## Non-negotiable boundaries
 
@@ -18,11 +18,20 @@ Turn scattered public competitor signals into two separate deliverables: a machi
 
 Read [references/collection-safety.md](references/collection-safety.md) before live collection.
 
+## Choose the research mode
+
+Read [references/research-modes.md](references/research-modes.md), then declare one mode in the research contract and `run_manifest.json`:
+
+- `competitor_intelligence`: audit verified company accounts, analyze content supply and performance, and study customer questions and reply behavior;
+- `customer_voice`: analyze a declared corpus of public customer signals by issue, intent, sentiment, severity, confidence, and visible official response.
+
+Do not present adjacent applications as implemented merely because they share the same evidence schema. Validate each mode with its own task contract, deterministic checks, and public-safe example.
+
 ## Workflow
 
 ### 0. Define the research contract
 
-Capture the target company, market, known handles/domains, business questions, public-source boundary, time cutoff, desired output, and allowed tools. Create a run directory and never mix targets.
+Capture the research mode, target company/brand/product/query, market, known handles/domains, business questions, public-source boundary, included accounts or search queries, date range, time cutoff, desired output, and allowed tools. Create a run directory and never mix targets.
 
 ### 1. Census platforms before choosing depth
 
@@ -49,11 +58,15 @@ Use incremental capture for virtualized or infinite-scroll pages. Deduplicate by
 
 For a public YouTube channel, read [references/youtube-adapter.md](references/youtube-adapter.md) and use `scripts/collect_youtube.py`. Start with a limited run, verify account identity and output fields, then set `--max-items-per-tab 0` only when the user wants a best-effort selected-tab census. The adapter collects metadata without downloading media and leaves translation/classification for the analysis phase.
 
+For repeat monitoring, read [references/incremental-updates.md](references/incremental-updates.md). Use a new run directory, apply an explicit date boundary when supported, and merge by stable ID with `scripts/merge_incremental.py`. Treat records absent from a bounded update as “not returned in this run,” not deleted.
+
 ### 3. Deep-read high-value conversations
 
 Rank content using reach, comment volume, recency, and strategic relevance, then capture publicly visible comments and official replies from the chosen set. If useful comments are sparse, widen the content set and say so explicitly; never inflate a thin sample.
 
 Classify commenter identity only when the text supports it: end customer, installer/DIY, reseller, or EPC/project party. If a group has fewer than three credible records, state “sample too small; not reported separately.” Determine official replies by exact account identity or an explicit creator/author marker.
+
+For `customer_voice`, the discovery boundary may also include approved public-search queries, reviews, or cross-account mentions. Record that boundary in the manifest. Retain account-owned comments as response evidence but exclude them from customer-demand counts.
 
 ### 4. Prepare and complete the Agent analysis handoff
 
@@ -88,6 +101,20 @@ python3 scripts/apply_analysis.py --bundle runs/target-company
 
 This checks the source fingerprint, exact ID coverage, translations, taxonomy, categories, confidence values, and representative evidence. It writes `analyzed_content.csv`, `analysis/validation_report.json`, and an evidence-linked HTML report without modifying raw evidence.
 
+For `customer_voice`, read [references/customer-voice-playbook.md](references/customer-voice-playbook.md), then prepare a separate analysis packet:
+
+```bash
+python3 scripts/prepare_customer_voice.py --bundle runs/target-company
+```
+
+Ask the Agent to complete `voice/voice_task.md`, `voice/voice_taxonomy.json`, and `voice/voice_results.csv`, then validate:
+
+```bash
+python3 scripts/apply_customer_voice.py --bundle runs/target-company
+```
+
+This mode validates every non-official signal, separates issue from intent/sentiment/severity, fingerprints both comments and parent content, links visible official replies, and writes a redacted evidence report without changing the raw files.
+
 ### 6. Produce two deliverables
 
 First finalize the evidence bundle:
@@ -116,6 +143,15 @@ Then independently write the report:
 
 Every quantitative claim must link back to row IDs or source URLs. Keep non-Latin original text in the evidence bundle unless the requested report font is verified to support it.
 
+For `customer_voice`, also deliver:
+
+- `voice/voice_taxonomy.json`;
+- `voice/voice_results.csv`;
+- `voice/validation_report.json`;
+- `analyzed_voice.csv`;
+- `customer_voice_summary.json`;
+- `customer_voice_report.html`.
+
 ### 7. Quality gate
 
 Before delivery, verify:
@@ -124,6 +160,7 @@ Before delivery, verify:
 - unique row counts and coverage by platform;
 - dates, engagement metrics, translations, and source URLs;
 - official-reply logic and commenter-identity confidence;
+- public-username removal from shareable customer-voice outputs;
 - arithmetic and denominators behind every claim;
 - raw-data/report separation;
 - removal of secrets, private data, and unsupported certainty.
