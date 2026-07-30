@@ -125,6 +125,19 @@ content.csv (source evidence, unchanged)
 
 The validator checks the source fingerprint, exact ID coverage, translation completeness, category definitions, confidence values, and representative evidence before producing the analyzed dataset and report.
 
+### The Agent does not grade its own work
+
+Agent output is treated as a proposal, not trusted as a finished result. A deterministic **evidence gate** fails closed:
+
+| Gate | Rejects |
+|---|---|
+| **Source fingerprint** | Analysis prepared against a modified `content.csv` |
+| **Exact ID-set comparison** | Omitted source records, duplicate IDs, or invented IDs |
+| **Taxonomy and coverage checks** | Blank translations, undeclared categories, incomplete definitions, or mismatched representative evidence |
+| **Uncertainty trace** | Invalid confidence values or unexplained low-confidence classifications |
+
+If any gate fails, the tool writes a failure report and does not create `analyzed_content.csv` or the final analysis report. This protects pipeline integrity and traceability; it does not claim that every public statement or model interpretation is objectively true.
+
 ## Run customer voice analysis
 
 When an evidence bundle contains public conversations in `comments.csv`, create an independent customer-voice task:

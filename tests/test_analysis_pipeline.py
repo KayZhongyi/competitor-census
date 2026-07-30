@@ -164,6 +164,70 @@ class AnalysisPipelineTest(unittest.TestCase):
             self.assertIn("content.csv changed", result.stderr)
             self.assertFalse((bundle / "analyzed_content.csv").exists())
 
+    def test_fail_closed_evidence_gate_rejects_invalid_agent_output(self) -> None:
+        cases = {
+            "missing source ID": (
+                lambda rows: rows.pop(),
+                "is missing record IDs",
+            ),
+            "invented source ID": (
+                lambda rows: rows.__setitem__(
+                    0, {**rows[0], "record_id": "AI-INVENTED-ID"}
+                ),
+                "has unknown record IDs",
+            ),
+            "unexplained low confidence": (
+                lambda rows: rows.__setitem__(
+                    0,
+                    {
+                        **rows[0],
+                        "classification_confidence": "low",
+                        "classification_notes": "",
+                    },
+                ),
+                "low confidence requires classification_notes",
+            ),
+        }
+        for label, (mutate, expected_error) in cases.items():
+            with self.subTest(label=label), tempfile.TemporaryDirectory() as tmp:
+                bundle, analyzed_rows = self.make_bundle(Path(tmp))
+                subprocess.run(
+                    [
+                        sys.executable,
+                        str(ROOT / "scripts/prepare_analysis.py"),
+                        "--bundle",
+                        str(bundle),
+                    ],
+                    check=True,
+                    cwd=ROOT,
+                )
+                self.complete_packet(bundle, analyzed_rows)
+                results_path = bundle / "analysis/analysis_results.csv"
+                rows = read_csv(results_path)
+                fields = list(rows[0])
+                mutate(rows)
+                write_csv(results_path, fields, rows)
+
+                result = subprocess.run(
+                    [
+                        sys.executable,
+                        str(ROOT / "scripts/apply_analysis.py"),
+                        "--bundle",
+                        str(bundle),
+                        "--no-report",
+                    ],
+                    cwd=ROOT,
+                    capture_output=True,
+                    text=True,
+                )
+                validation = json.loads(
+                    (bundle / "analysis/validation_report.json").read_text(encoding="utf-8")
+                )
+                self.assertEqual(result.returncode, 1)
+                self.assertEqual(validation["status"], "failed")
+                self.assertIn(expected_error, result.stderr)
+                self.assertFalse((bundle / "analyzed_content.csv").exists())
+
 
 if __name__ == "__main__":
     unittest.main()
